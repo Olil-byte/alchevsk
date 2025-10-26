@@ -3,7 +3,7 @@ package lpr.olil.model;
 public class CurvedCrystallizer extends Crystallizer {
     private double castingSpeed;
 
-    CurvedCrystallizer(double castingSpeed) {
+    public CurvedCrystallizer(double castingSpeed) {
         this.castingSpeed = castingSpeed;
     }
 

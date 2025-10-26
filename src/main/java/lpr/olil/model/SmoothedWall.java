@@ -1,9 +1,9 @@
 package lpr.olil.model;
 
 public class SmoothedWall extends Wall {
-    private final double thickness;
-    private final double length;
-    private final double activeLength;
+    private final double thickness; // m
+    private final double length; // m
+    private final double activeLength; // m
 
     public SmoothedWall(double length, double activeLength, double thickness) {
         this.length = length;

@@ -1,8 +1,11 @@
-package lpr.olil.model;
+package lpr.olil.calculator;
+
+import lpr.olil.model.Slab;
+import lpr.olil.model.Wall;
 
 public class GeometryCalculator {
     public static double calculatePerimeter(final Slab slab) {
-        return slab.getWidth() * slab.getHeight() * 2.0;
+        return (slab.getWidth() + slab.getHeight()) * 2.0;
     }
 
     public static double calculateDistanceBetweenDucts(final Wall wall, double ductDiameter) {

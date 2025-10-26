@@ -3,12 +3,12 @@ package lpr.olil.model;
 public class WaterFlow {
     private static final double MIN_TEMPERATURE = 20.0;
 
-    private final double inletTemperature;
-    private final double outletTemperature;
+    private final double inletTemperature; // 'C
+    private final double outletTemperature; // 'C
 
-    private final double density;
+    private final double density; // Kg / m^3
 
-    private final double conductivity;
+    private final double conductivity; // J / (Kg * K)
 
     public WaterFlow(double inletTemperature, double outletTemperature, double density, double conductivity) {
         if (inletTemperature < MIN_TEMPERATURE) {

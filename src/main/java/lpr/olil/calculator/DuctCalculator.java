@@ -1,4 +1,7 @@
-package lpr.olil.model;
+package lpr.olil.calculator;
+
+import lpr.olil.model.Slab;
+import lpr.olil.model.Wall;
 
 import java.util.Objects;
 

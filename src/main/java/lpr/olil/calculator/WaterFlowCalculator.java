@@ -1,4 +1,6 @@
-package lpr.olil.model;
+package lpr.olil.calculator;
+
+import lpr.olil.model.*;
 
 public class WaterFlowCalculator {
     private static double getScalarA(final Crystallizer crystallizer, final Wall wall) {
@@ -26,14 +28,13 @@ public class WaterFlowCalculator {
             final Crystallizer crystallizer,
             final Wall wall,
             final WaterFlow waterFlow,
-            double castingSpeed,
             double ductDiameter
     ) {
 
         final double A = getScalarA(crystallizer, wall);
         final double m = getScalarM(crystallizer, wall);
 
-        double result = (A * castingSpeed * m * ductResult.perimeter * wall.getActiveLength()) /
+        double result = (A * Math.pow(crystallizer.getCastingSpeed(), m) * ductResult.perimeter * wall.getActiveLength()) /
                 (ductResult.ductCount * Math.PI * ductDiameter * ductDiameter / 4.0 * waterFlow.getConductivity() *
                         waterFlow.getDensity() * (waterFlow.getOutletTemperature() - waterFlow.getInletTemperature()));
 
@@ -76,12 +77,11 @@ public class WaterFlowCalculator {
             final Crystallizer crystallizer,
             final Wall wall,
             final WaterFlow waterFlow,
-            double castingSpeed,
             double ductDiameter
     ) {
 
         final double flowVelocity =
-                calculateFlowVelocity(ductResult, crystallizer, wall, waterFlow, castingSpeed, ductDiameter);
+                calculateFlowVelocity(ductResult, crystallizer, wall, waterFlow, ductDiameter);
 
         final double flowArea = calculateFlowArea(ductResult, ductDiameter);
 
