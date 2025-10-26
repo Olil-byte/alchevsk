@@ -33,9 +33,17 @@ public class WaterFlowCalculator {
         final double A = getScalarA(crystallizer, wall);
         final double m = getScalarM(crystallizer, wall);
 
-        return (A * castingSpeed * m * ductResult.perimeter * wall.getActiveLength()) /
+        double result = (A * castingSpeed * m * ductResult.perimeter * wall.getActiveLength()) /
                 (ductResult.ductCount * Math.PI * ductDiameter * ductDiameter / 4.0 * waterFlow.getConductivity() *
                         waterFlow.getDensity() * (waterFlow.getOutletTemperature() - waterFlow.getInletTemperature()));
+
+        if (result < 2.0) {
+            result = 2.0;
+        } else if (result > 5.0) {
+            result = 5.0;
+        }
+
+        return result;
     }
 
     private static double calculateFlowArea(
@@ -72,7 +80,8 @@ public class WaterFlowCalculator {
             double ductDiameter
     ) {
 
-        final double flowVelocity = calculateFlowVelocity(ductResult, crystallizer, wall, waterFlow, castingSpeed, ductDiameter);
+        final double flowVelocity =
+                calculateFlowVelocity(ductResult, crystallizer, wall, waterFlow, castingSpeed, ductDiameter);
 
         final double flowArea = calculateFlowArea(ductResult, ductDiameter);
 

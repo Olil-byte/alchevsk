@@ -13,7 +13,7 @@ public class DuctCalculator {
             this.distanceBetweenDucts = distanceBetweenDucts;
             this.ductCount = ductCount;
         }
-    };
+    }
 
     public static Result calculateDuctCount(
             final Slab slab,
