@@ -1,5 +1,23 @@
 package lpr.olil.model;
 
+class InvalidSteelException extends RuntimeException {
+    private final boolean isNegativeCarbon;
+    private final boolean isCarbonMoreThan100Percents;
+
+    public InvalidSteelException(boolean isNegativeCarbon, boolean isCarbonMoreThan100Percents) {
+        this.isNegativeCarbon = isNegativeCarbon;
+        this.isCarbonMoreThan100Percents = isCarbonMoreThan100Percents;
+    }
+
+    public boolean isNegativeCarbon() {
+        return isNegativeCarbon;
+    }
+
+    public boolean isCarbonMoreThan100Percents() {
+        return isCarbonMoreThan100Percents;
+    }
+}
+
 public class Steel extends Metal {
 //    private static final Map<Double, Double> LIQUIDUS_BY_CARBON = Map.ofEntries(
 //            entry(0.0000, 1539.0),
@@ -67,6 +85,13 @@ public class Steel extends Metal {
 
     public Steel (double carbon) {
         this.carbon = carbon;
+
+        final boolean isNegativeCarbon = carbon < 0.0;
+        final boolean isCarbonMoreThan100Percents = carbon > 1.0;
+
+        if (isNegativeCarbon || isCarbonMoreThan100Percents) {
+            throw new InvalidSteelException(isNegativeCarbon, isCarbonMoreThan100Percents);
+        }
 
         this.liquidus = 1812.0 - 80.0 * carbon;
         this.solidus = 1786.0 - 156.0 * carbon;

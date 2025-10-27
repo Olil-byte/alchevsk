@@ -1,5 +1,39 @@
 package lpr.olil.model;
 
+class InvalidWaterFlowException extends RuntimeException {
+    private final boolean isInletTemperatureBelowMinimal;
+    private final boolean isInletTemperatureNotLessThanOutlet;
+    private final boolean isDensityNonPositive;
+    private final boolean isConductivityNonPositive;
+
+    public InvalidWaterFlowException(
+            boolean isInletTemperatureBelowMinimal,
+            boolean isInletTemperatureNotLessThanOutlet,
+            boolean isDensityNonPositive,
+            boolean isConductivityNonPositive)
+    {
+        super();
+
+        this.isInletTemperatureBelowMinimal = isInletTemperatureBelowMinimal;
+        this.isInletTemperatureNotLessThanOutlet = isInletTemperatureNotLessThanOutlet;
+        this.isDensityNonPositive = isDensityNonPositive;
+        this.isConductivityNonPositive = isConductivityNonPositive;
+    }
+
+    public boolean isInletTemperatureBelowMinimal() {
+        return isInletTemperatureBelowMinimal;
+    }
+    public boolean isInletTemperatureNotLessThanOutlet() {
+        return isInletTemperatureNotLessThanOutlet;
+    }
+    public boolean isDensityNonPositive() {
+        return isDensityNonPositive;
+    }
+    public boolean isConductivityNonPositive() {
+        return isConductivityNonPositive;
+    }
+}
+
 public class WaterFlow {
     private static final double MIN_TEMPERATURE = 20.0;
 
@@ -11,47 +45,28 @@ public class WaterFlow {
     private final double conductivity; // J / (Kg * K)
 
     public WaterFlow(double inletTemperature, double outletTemperature, double density, double conductivity) {
-        if (inletTemperature < MIN_TEMPERATURE) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Inlet temperature must be more than %f 'C",
-                            MIN_TEMPERATURE
-                    )
-            );
-        }
+        final boolean isInletTemperatureBelowMinimal = inletTemperature < 20.0;
+        final boolean isInletTemperatureNotLessThanOutlet = inletTemperature >= outletTemperature;
+        final boolean isDensityNonPositive = density <= 0.0;
+        final boolean isConductivityNonPositive = conductivity <= 0.0;
 
-        if (inletTemperature > outletTemperature) {
-            throw new IllegalArgumentException(
-                        String.format(
-                                "Inlet temperature (%f 'C) must be less than outlet temperature (%f 'C)",
-                                inletTemperature,
-                                outletTemperature
-                        )
-                    );
+        if (isInletTemperatureBelowMinimal ||
+                isInletTemperatureNotLessThanOutlet ||
+                isDensityNonPositive ||
+                isConductivityNonPositive
+        ) {
+            throw new InvalidWaterFlowException(
+                    isInletTemperatureBelowMinimal,
+                    isInletTemperatureNotLessThanOutlet,
+                    isDensityNonPositive,
+                    isConductivityNonPositive
+            );
         }
 
         this.inletTemperature = inletTemperature;
         this.outletTemperature = outletTemperature;
 
-        if (density <= 0.0) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Density must be positive, got %f",
-                            density
-                    )
-            );
-        }
-
         this.density = density;
-
-        if (conductivity <= 0.0) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Conductivity must be positive, got %f",
-                            conductivity
-                    )
-            );
-        }
         this.conductivity = conductivity;
     }
 
