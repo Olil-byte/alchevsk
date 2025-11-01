@@ -26,10 +26,10 @@ public class WaterFlowCalculator {
     private static double calculateFlowVelocity(
             final DuctCalculator.Result ductResult,
             final Crystallizer crystallizer,
-            final Wall wall,
-            final WaterFlow waterFlow,
-            double ductDiameter
+            final WaterFlow waterFlow
     ) {
+        final Wall wall = crystallizer.getWall();
+        final double ductDiameter = crystallizer.getDuctDiameter();
 
         final double A = getScalarA(crystallizer, wall);
         final double m = getScalarM(crystallizer, wall);
@@ -75,13 +75,12 @@ public class WaterFlowCalculator {
     public static Result calculateWaterFlow(
             final DuctCalculator.Result ductResult,
             final Crystallizer crystallizer,
-            final Wall wall,
-            final WaterFlow waterFlow,
-            double ductDiameter
+            final WaterFlow waterFlow
     ) {
+        final double ductDiameter = crystallizer.getDuctDiameter();
 
         final double flowVelocity =
-                calculateFlowVelocity(ductResult, crystallizer, wall, waterFlow, ductDiameter);
+                calculateFlowVelocity(ductResult, crystallizer, waterFlow);
 
         final double flowArea = calculateFlowArea(ductResult, ductDiameter);
 

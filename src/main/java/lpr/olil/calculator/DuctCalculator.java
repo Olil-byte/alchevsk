@@ -1,5 +1,6 @@
 package lpr.olil.calculator;
 
+import lpr.olil.model.Crystallizer;
 import lpr.olil.model.Slab;
 import lpr.olil.model.Wall;
 
@@ -20,15 +21,11 @@ public class DuctCalculator {
 
     public static Result calculateDuctCount(
             final Slab slab,
-            final Wall wall,
-            double ductDiameter
+            final Crystallizer crystallizer
     ) {
-        Objects.requireNonNull(slab);
-        Objects.requireNonNull(wall);
 
-        if (ductDiameter <= 0.0) {
-            throw new IllegalArgumentException("Duct diameter must be positive, got " + ductDiameter);
-        }
+        final double ductDiameter = crystallizer.getDuctDiameter();
+        final Wall wall = crystallizer.getWall();
 
         final double perimeter = GeometryCalculator.calculatePerimeter(slab);
 

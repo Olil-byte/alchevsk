@@ -13,16 +13,31 @@ class InvalidCurvedCrystallizerException extends RuntimeException {
 }
 
 public class CurvedCrystallizer extends Crystallizer {
+    private Wall wall;
+    private double ductDiameter;
     private double castingSpeed;
 
-    public CurvedCrystallizer(double castingSpeed) {
+    public CurvedCrystallizer(Wall wall, double ductDiameter, double castingSpeed) {
         final boolean isNegativeCastingSpeed = castingSpeed < 0.0;
 
         if (isNegativeCastingSpeed) {
             throw new InvalidCurvedCrystallizerException(isNegativeCastingSpeed);
         }
 
+        this.wall = wall;
+        this.ductDiameter = ductDiameter;
+
         this.castingSpeed = castingSpeed;
+    }
+
+    @Override
+    public Wall getWall() {
+        return wall;
+    }
+
+    @Override
+    public double getDuctDiameter() {
+        return ductDiameter;
     }
 
     @Override
