@@ -1,9 +1,6 @@
 package lpr.olil.view;
 
-import lpr.olil.calculator.DuctCalculator;
-
-import lpr.olil.calculator.WaterFlowCalculator;
-import lpr.olil.model.*;
+import lpr.olil.model.Slab;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,55 +35,56 @@ public class GeometryCalculatorPanel extends JPanel {
     private class CalculateButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println(wallLengthField.getText());
-            Wall wall = null;
-            try {
-                final double length = Double.parseDouble(wallLengthField.getText());
-                System.out.println(length);
-                final double activeLength = Double.parseDouble(wallActiveLengthField.getText());
-                final double thickness = Double.parseDouble(wallActiveLengthField.getText());
-
-                wall = new SmoothedWall(length, activeLength, thickness);
-            } catch (RuntimeException exception) {
-
-            }
-
-            Slab slab = null;
-            try {
-                final double width = Double.parseDouble(slabWidthField.getText());
-                final double height = Double.parseDouble(slabHeightField.getText());
-
-                slab = new Slab(width, height);
-            } catch (InvalidSlabException exception) {
-
-            }
-
-            double ductDiameter = 0.0;
-            try {
-                ductDiameter = Double.parseDouble(ductDiameterField.getText());
-            } catch (RuntimeException exception) {
-
-            }
-
-            double castingSpeed = 0.0;
-            try {
-                castingSpeed = Double.parseDouble(castingSpeedField.getText());
-            } catch (RuntimeException exception) {
-
-            }
-
-            Crystallizer crystallizer = new CurvedCrystallizer(wall, ductDiameter, castingSpeed);
-
-            final DuctCalculator.Result ductCalculationResult = DuctCalculator.calculateDuctCount(
-                    slab,
-                    crystallizer
-            );
-//            WaterFlowCalculator.calculateWaterFlow(
-//                    ductCalculationResult,
+//            System.out.println(wallLengthField.getText());
+//            Wall wall = null;
+//            try {
+//                final double length = Double.parseDouble(wallLengthField.getText());
+//                System.out.println(length);
+//                final double activeLength = Double.parseDouble(wallActiveLengthField.getText());
+//                final double thickness = Double.parseDouble(wallActiveLengthField.getText());
+//
+//                wall = new SmoothedWall(length, activeLength, thickness);
+//            } catch (RuntimeException exception) {
+//
+//            }
+//
+//            Slab slab = null;
+//            try {
+//                final double width = Double.parseDouble(slabWidthField.getText());
+//                final double height = Double.parseDouble(slabHeightField.getText());
+//
+//                slab = new Slab(width, height);
+//            } catch (InvalidSlabException exception) {
+//
+//            }
+//
+//            double ductDiameter = 0.0;
+//            try {
+//                ductDiameter = Double.parseDouble(ductDiameterField.getText());
+//            } catch (RuntimeException exception) {
+//
+//            }
+//
+//            double castingSpeed = 0.0;
+//            try {
+//                castingSpeed = Double.parseDouble(castingSpeedField.getText());
+//            } catch (RuntimeException exception) {
+//
+//            }
+//
+//            Crystallizer crystallizer = new CurvedCrystallizer(wall, ductDiameter, castingSpeed);
+//
+//            final DuctCalculator.Result ductCalculationResult = DuctCalculator.calculateDuctCount(
+//                    slab,
 //                    crystallizer
-//                    );
-
-            ductCountField.field.setText(Integer.toString(ductCalculationResult.ductCount));
+//            );
+////            WaterFlowCalculator.calculateWaterFlow(
+////                    ductCalculationResult,
+////                    crystallizer,
+////                    waterFlow
+////            );
+//
+//            ductCountField.field.setText(Integer.toString(ductCalculationResult.ductCount));
         }
     }
 
@@ -97,13 +95,25 @@ public class GeometryCalculatorPanel extends JPanel {
     private ParameterField slabWidthField;
     private ParameterField slabHeightField;
 
-    private ParameterField wallLengthField;
-    private ParameterField wallActiveLengthField;
-    private ParameterField wallThicknessField;
+    private CcmHelper ccmHelper;
+
+    private SlabHelper slabHelper;
+
+    private WallHelper wallHelper;
+
+    private DuctHelper ductHelper;
 
     private ParameterField ductCountField;
 
     private ParameterField castingSpeedField;
+
+    // Water flow parameters
+    private ParameterField inletTemperatureField;
+    private ParameterField outletTemperatureField;
+
+    private ParameterField densityField;
+
+    private ParameterField conductivityField;
 
     private CalculateButtonListener calculateBtnListener;
 
@@ -111,20 +121,17 @@ public class GeometryCalculatorPanel extends JPanel {
         layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         setLayout(layout);
 
-        ductDiameterField = new ParameterField("Диаметр каналов (м)");
-        add(ductDiameterField);
+        ccmHelper = new CcmHelper();
+        add(ccmHelper);
 
-        slabWidthField = new ParameterField("Ширина сляба (м)");
-        add(slabWidthField);
-        slabHeightField = new ParameterField("Толщина сляба (м)");
-        add(slabHeightField);
+        slabHelper = new SlabHelper();
+        add(slabHelper);
 
-        wallLengthField = new ParameterField("Длина стенки (м)");
-        add(wallLengthField);
-        wallActiveLengthField = new ParameterField("Длина активной зоны (м)");
-        add(wallActiveLengthField);
-        wallThicknessField = new ParameterField("Толщина стенки (м)");
-        add(wallThicknessField);
+        wallHelper = new WallHelper();
+        add(wallHelper);
+
+        ductHelper = new DuctHelper();
+        add(ductHelper);
 
         castingSpeedField = new ParameterField("Скорость разливки (м/мин)");
 
@@ -136,5 +143,9 @@ public class GeometryCalculatorPanel extends JPanel {
         ParameterField ductCountField = new ParameterField("Количество каналов (шт.)");
         ductCountField.field.setEditable(false);
         add(ductCountField);
+
+        //JScrollPane scrollPane = new JScrollPane(this);
+        //scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //add(scrollPane);
     }
 }

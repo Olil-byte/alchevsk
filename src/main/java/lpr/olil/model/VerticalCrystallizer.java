@@ -1,10 +1,10 @@
 package lpr.olil.model;
 
 public class VerticalCrystallizer extends Crystallizer {
-    private Wall wall;
-    private double ductDiameter;
+    private final Wall wall;
+    private final double ductDiameter;
 
-    private double castingSpeed;
+    private final double castingSpeed;
 
     VerticalCrystallizer(Wall wall, double ductDiameter, double castingSpeed) {
         this.wall = wall;

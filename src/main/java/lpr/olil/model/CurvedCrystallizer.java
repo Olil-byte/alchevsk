@@ -13,9 +13,9 @@ class InvalidCurvedCrystallizerException extends RuntimeException {
 }
 
 public class CurvedCrystallizer extends Crystallizer {
-    private Wall wall;
-    private double ductDiameter;
-    private double castingSpeed;
+    private final Wall wall;
+    private final double ductDiameter;
+    private final double castingSpeed;
 
     public CurvedCrystallizer(Wall wall, double ductDiameter, double castingSpeed) {
         final boolean isNegativeCastingSpeed = castingSpeed < 0.0;
