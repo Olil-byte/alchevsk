@@ -3,20 +3,20 @@ package lpr.olil.calculator;
 import lpr.olil.model.*;
 
 public class WaterFlowCalculator {
-    private static double getScalarA(final Crystallizer crystallizer, final Wall wall) {
-        if (crystallizer instanceof CurvedCrystallizer && wall instanceof SmoothedWall) {
+    private static double getScalarA(final Ccm ccm, final Wall wall) {
+        if (ccm instanceof CurvedCcm && wall instanceof SmoothedWall) {
             return 953.0;
-        } else if (crystallizer instanceof VerticalCrystallizer && wall instanceof SmoothedWall) {
+        } else if (ccm instanceof VerticalCcm && wall instanceof SmoothedWall) {
             return 1020.0;
         } else {
             throw new IllegalStateException();
         }
     }
 
-    private static double getScalarM(final Crystallizer crystallizer, final Wall wall) {
-        if (crystallizer instanceof CurvedCrystallizer && wall instanceof SmoothedWall) {
+    private static double getScalarM(final Ccm ccm, final Wall wall) {
+        if (ccm instanceof CurvedCcm && wall instanceof SmoothedWall) {
             return 1.0 / 3.0;
-        } else if (crystallizer instanceof VerticalCrystallizer && wall instanceof SmoothedWall) {
+        } else if (ccm instanceof VerticalCcm && wall instanceof SmoothedWall) {
             return 1.0 / 2.0;
         } else {
             throw new IllegalStateException();
@@ -25,16 +25,18 @@ public class WaterFlowCalculator {
 
     private static double calculateFlowVelocity(
             final DuctCalculator.Result ductResult,
-            final Crystallizer crystallizer,
+            final Ccm ccm,
             final WaterFlow waterFlow
     ) {
+        final Crystallizer crystallizer = ccm.getCrystallizer();
+
         final Wall wall = crystallizer.getWall();
         final double ductDiameter = crystallizer.getDuctDiameter();
 
-        final double A = getScalarA(crystallizer, wall);
-        final double m = getScalarM(crystallizer, wall);
+        final double A = getScalarA(ccm, wall);
+        final double m = getScalarM(ccm, wall);
 
-        double result = (A * Math.pow(crystallizer.getCastingSpeed(), m) * ductResult.perimeter * wall.getActiveLength()) /
+        double result = (A * Math.pow(ccm.getCastingSpeed(), m) * ductResult.perimeter * wall.getActiveLength()) /
                 (ductResult.ductCount * Math.PI * ductDiameter * ductDiameter / 4.0 * waterFlow.getConductivity() *
                         waterFlow.getDensity() * (waterFlow.getOutletTemperature() - waterFlow.getInletTemperature()));
 
@@ -72,15 +74,17 @@ public class WaterFlowCalculator {
         }
     }
 
-    public static Result calculateWaterFlow(
+    public static Result calculate(
             final DuctCalculator.Result ductResult,
-            final Crystallizer crystallizer,
+            final Ccm ccm,
             final WaterFlow waterFlow
     ) {
+        final Crystallizer crystallizer = ccm.getCrystallizer();
+
         final double ductDiameter = crystallizer.getDuctDiameter();
 
         final double flowVelocity =
-                calculateFlowVelocity(ductResult, crystallizer, waterFlow);
+                calculateFlowVelocity(ductResult, ccm, waterFlow);
 
         final double flowArea = calculateFlowArea(ductResult, ductDiameter);
 

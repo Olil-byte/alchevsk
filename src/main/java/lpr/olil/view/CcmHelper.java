@@ -1,8 +1,9 @@
 package lpr.olil.view;
 
+import lpr.olil.model.CcmBuilder;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 
 public class CcmHelper extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
@@ -52,6 +53,18 @@ public class CcmHelper extends JPanel {
                 BorderFactory.createLineBorder(Color.BLACK),
                 "МНЛЗ"
         ));
+    }
+
+    public CcmBuilder.Geometry getSelectedGeometryType() {
+        return switch (geometrySelector.getSelectedIndex()) {
+            case CURVED -> CcmBuilder.Geometry.CURVED;
+            case VERTICAL -> CcmBuilder.Geometry.VERTICAL;
+            default -> null;
+        };
+    }
+
+    public double getCastingSpeedValue() {
+        return Double.parseDouble(castingSpeedField.getText());
     }
 
 }

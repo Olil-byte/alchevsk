@@ -11,8 +11,8 @@ public class SlabHelper extends JPanel {
     private JLabel widthLabel;
     private JTextField widthField;
 
-    private JLabel heightLabel;
-    private JTextField heightField;
+    private JLabel lengthLabel;
+    private JTextField lengthField;
 
     public SlabHelper() {
         super();
@@ -25,30 +25,38 @@ public class SlabHelper extends JPanel {
         widthField = new JTextField();
         widthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
-        heightLabel = new JLabel("Длина (м)");
+        lengthLabel = new JLabel("Длина (м)");
 
-        heightField = new JTextField();
-        heightField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        lengthField = new JTextField();
+        lengthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(widthLabel)
                         .addComponent(widthField)
-                        .addComponent(heightLabel)
-                        .addComponent(heightField)
+                        .addComponent(lengthLabel)
+                        .addComponent(lengthField)
         );
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(widthLabel)
                         .addComponent(widthField)
-                        .addComponent(heightLabel)
-                        .addComponent(heightField)
+                        .addComponent(lengthLabel)
+                        .addComponent(lengthField)
         );
 
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.BLACK),
                 "Сляб"
         ));
+    }
+
+    public double getWidthValue() {
+        return Double.parseDouble(widthField.getText());
+    }
+
+    public double getLengthValue() {
+        return Double.parseDouble(lengthField.getText());
     }
 }

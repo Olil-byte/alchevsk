@@ -1,10 +1,9 @@
 package lpr.olil.calculator;
 
+import lpr.olil.model.Ccm;
 import lpr.olil.model.Crystallizer;
 import lpr.olil.model.Slab;
 import lpr.olil.model.Wall;
-
-import java.util.Objects;
 
 public class DuctCalculator {
     public static class Result {
@@ -21,8 +20,9 @@ public class DuctCalculator {
 
     public static Result calculateDuctCount(
             final Slab slab,
-            final Crystallizer crystallizer
+            final Ccm ccm
     ) {
+        final Crystallizer crystallizer = ccm.getCrystallizer();
 
         final double ductDiameter = crystallizer.getDuctDiameter();
         final Wall wall = crystallizer.getWall();

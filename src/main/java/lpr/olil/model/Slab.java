@@ -2,7 +2,7 @@ package lpr.olil.model;
 
 public class Slab {
     private final double width; // m
-    private final double height; // m
+    private final double length; // m
 
     public Slab(double width, double height) {
         final boolean isNonPositiveWidth = width <= 0.0;
@@ -13,13 +13,13 @@ public class Slab {
         }
 
         this.width = width;
-        this.height = height;
+        this.length = height;
     }
 
     public double getWidth() {
         return width;
     }
-    public double getHeight() {
-        return height;
+    public double getLength() {
+        return length;
     }
 }

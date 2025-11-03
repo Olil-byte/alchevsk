@@ -3,6 +3,8 @@ package lpr.olil.view;
 import javax.swing.*;
 import java.awt.*;
 
+import lpr.olil.model.WallBuilder;
+
 public class WallHelper extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
@@ -78,5 +80,25 @@ public class WallHelper extends JPanel {
                 BorderFactory.createLineBorder(Color.BLACK),
                 "Стенка"
         ));
+    }
+
+    public WallBuilder.Type getSelectedType() {
+        return switch (typeSelector.getSelectedIndex()) {
+            case SMOOTHED -> WallBuilder.Type.SMOOTHED;
+            case PROFILED -> WallBuilder.Type.PROFILED;
+            default -> null;
+        };
+    }
+
+    public double getLengthValue() {
+        return Double.parseDouble(lengthField.getText());
+    }
+
+    public double getActiveLengthValue() {
+        return Double.parseDouble(activeLengthField.getText());
+    }
+
+    public double getThicknessValue() {
+        return Double.parseDouble(thicknessField.getText());
     }
 }

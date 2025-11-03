@@ -39,4 +39,8 @@ public class DuctHelper extends JPanel {
                 "Каналы"
         ));
     }
+
+    public double getDiameterValue() {
+        return Double.parseDouble(diameterField.getText());
+    }
 }

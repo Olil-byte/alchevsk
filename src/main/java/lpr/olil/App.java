@@ -2,7 +2,7 @@ package lpr.olil;
 
 import lpr.olil.calculator.*;
 import lpr.olil.model.*;
-import lpr.olil.view.GeometryCalculatorPanel;
+import lpr.olil.view.MainFrame;
 
 import javax.swing.*;
 
@@ -11,15 +11,11 @@ public class App {
     private static JFrame frame;
 
     private static void createAndShowGUI() {
-        frame = new JFrame("Алчевск: калькулятор металлурга");
+        frame = new MainFrame("Алчевск: металлургический калькулятор");
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.setSize(300, 300);
-
-        GeometryCalculatorPanel geometryCalculatorPanel = new GeometryCalculatorPanel();
-
-        frame.add(geometryCalculatorPanel);
 
         frame.setVisible(true);
     }
@@ -37,20 +33,22 @@ public class App {
         final Wall wall = new SmoothedWall(1.0, 0.9,0.01);
         final Slab slab = new Slab(1.3, 0.16);
 
-        Crystallizer crystallizer = new CurvedCrystallizer(wall, ductDiameter, 1.3);
+        Crystallizer crystallizer = new Crystallizer(wall, ductDiameter);
+
+        Ccm ccm = new CurvedCcm(1.3, crystallizer);
 
         final DuctCalculator.Result ductCalculationResult = DuctCalculator.calculateDuctCount(
                 slab,
-                crystallizer
+                ccm
         );
 
         System.out.println(ductCalculationResult.ductCount);
 
         WaterFlow waterFlow = new WaterFlow(20, 50, 1000, 4.187);
 
-        final WaterFlowCalculator.Result waterFlowCalculationResult = WaterFlowCalculator.calculateWaterFlow(
+        final WaterFlowCalculator.Result waterFlowCalculationResult = WaterFlowCalculator.calculate(
                 ductCalculationResult,
-                crystallizer,
+                ccm,
                 waterFlow
         );
 

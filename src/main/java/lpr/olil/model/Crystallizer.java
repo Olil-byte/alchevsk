@@ -1,9 +1,20 @@
 package lpr.olil.model;
 
-public abstract class Crystallizer {
-    public abstract double getDuctDiameter();
+public class Crystallizer {
+    private double ductDiameter;
 
-    public abstract Wall getWall();
+    private Wall wall;
 
-    public abstract double getCastingSpeed();
+    public Crystallizer(Wall wall, double ductDiameter) {
+        this.ductDiameter = ductDiameter;
+        this.wall = wall;
+    }
+
+    public double getDuctDiameter() {
+        return ductDiameter;
+    }
+
+    public Wall getWall() {
+        return wall;
+    }
 }
