@@ -17,8 +17,7 @@ public class CcmHelper extends JPanel {
     private JLabel geometryLabel;
     private JComboBox<String> geometrySelector;
 
-    private JLabel castingSpeedLabel;
-    private JTextField castingSpeedField;
+    private NumberParameterField castingSpeedField;
 
     public CcmHelper() {
         layout = new GroupLayout(this);
@@ -29,15 +28,12 @@ public class CcmHelper extends JPanel {
         geometrySelector = new JComboBox<>(geometries);
         geometrySelector.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
-        castingSpeedLabel = new JLabel("Скорость разливки (м/мин)");
-        castingSpeedField = new JTextField();
-        castingSpeedField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        castingSpeedField = new NumberParameterField("Скорость разливки (м/мин)");
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(geometryLabel)
                         .addComponent(geometrySelector)
-                        .addComponent(castingSpeedLabel)
                         .addComponent(castingSpeedField)
         );
 
@@ -45,7 +41,6 @@ public class CcmHelper extends JPanel {
                 layout.createSequentialGroup()
                         .addComponent(geometryLabel)
                         .addComponent(geometrySelector)
-                        .addComponent(castingSpeedLabel)
                         .addComponent(castingSpeedField)
         );
 
@@ -64,7 +59,7 @@ public class CcmHelper extends JPanel {
     }
 
     public double getCastingSpeedValue() {
-        return Double.parseDouble(castingSpeedField.getText());
+        return castingSpeedField.getValue();
     }
 
 }

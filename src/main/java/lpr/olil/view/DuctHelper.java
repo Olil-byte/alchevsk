@@ -8,8 +8,7 @@ public class DuctHelper extends JPanel {
 
     private GroupLayout layout;
 
-    private JLabel diameterLabel;
-    private JTextField diameterField;
+    private NumberParameterField diameterField;
 
     public DuctHelper() {
         super();
@@ -17,20 +16,15 @@ public class DuctHelper extends JPanel {
         layout = new GroupLayout(this);
         setLayout(layout);
 
-        diameterLabel = new JLabel("Диаметр (м)");
-
-        diameterField = new JTextField();
-        diameterField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        diameterField = new NumberParameterField("Диаметр (м)");
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(diameterLabel)
                         .addComponent(diameterField)
         );
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(diameterLabel)
                         .addComponent(diameterField)
         );
 
@@ -41,6 +35,6 @@ public class DuctHelper extends JPanel {
     }
 
     public double getDiameterValue() {
-        return Double.parseDouble(diameterField.getText());
+        return diameterField.getValue();
     }
 }

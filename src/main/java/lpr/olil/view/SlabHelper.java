@@ -4,15 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SlabHelper extends JPanel {
-    private static final int MAX_COMPONENT_HEIGHT = 20;
 
     private GroupLayout layout;
 
-    private JLabel widthLabel;
-    private JTextField widthField;
+    private NumberParameterField widthField;
 
-    private JLabel lengthLabel;
-    private JTextField lengthField;
+    private NumberParameterField lengthField;
 
     public SlabHelper() {
         super();
@@ -20,29 +17,19 @@ public class SlabHelper extends JPanel {
         layout = new GroupLayout(this);
         setLayout(layout);
 
-        widthLabel = new JLabel("Ширина (м)");
+        widthField = new NumberParameterField("Ширина (м)");
 
-        widthField = new JTextField();
-        widthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
-
-        lengthLabel = new JLabel("Длина (м)");
-
-        lengthField = new JTextField();
-        lengthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        lengthField = new NumberParameterField("Длина (м)");
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(widthLabel)
                         .addComponent(widthField)
-                        .addComponent(lengthLabel)
                         .addComponent(lengthField)
         );
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(widthLabel)
                         .addComponent(widthField)
-                        .addComponent(lengthLabel)
                         .addComponent(lengthField)
         );
 
@@ -53,10 +40,10 @@ public class SlabHelper extends JPanel {
     }
 
     public double getWidthValue() {
-        return Double.parseDouble(widthField.getText());
+        return widthField.getValue();
     }
 
     public double getLengthValue() {
-        return Double.parseDouble(lengthField.getText());
+        return lengthField.getValue();
     }
 }

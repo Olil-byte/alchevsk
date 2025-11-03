@@ -17,14 +17,11 @@ public class WallHelper extends JPanel {
     private JLabel typeLabel;
     private JComboBox<String> typeSelector;
 
-    private JLabel lengthLabel;
-    private JTextField lengthField;
+    private NumberParameterField lengthField;
 
-    private JLabel activeLengthLabel;
-    private JTextField activeLengthField;
+    private NumberParameterField activeLengthField;
 
-    private JLabel thicknessLabel;
-    private JTextField thicknessField;
+    private NumberParameterField thicknessField;
 
     public WallHelper() {
         super();
@@ -37,30 +34,18 @@ public class WallHelper extends JPanel {
         typeSelector = new JComboBox<>(types);
         typeSelector.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
-        lengthLabel = new JLabel("Длина (м)");
+        lengthField = new NumberParameterField("Длина (м)");
 
-        lengthField = new JTextField();
-        lengthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        activeLengthField = new NumberParameterField("Активная длина (м)");
 
-        activeLengthLabel = new JLabel("Активная длина (м)");
-
-        activeLengthField = new JTextField();
-        activeLengthField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
-
-        thicknessLabel = new JLabel("Толщина (м)");
-
-        thicknessField = new JTextField();
-        thicknessField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        thicknessField = new NumberParameterField("Толщина (м)");
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(typeLabel)
                         .addComponent(typeSelector)
-                        .addComponent(lengthLabel)
                         .addComponent(lengthField)
-                        .addComponent(activeLengthLabel)
                         .addComponent(activeLengthField)
-                        .addComponent(thicknessLabel)
                         .addComponent(thicknessField)
         );
 
@@ -68,11 +53,8 @@ public class WallHelper extends JPanel {
                 layout.createSequentialGroup()
                         .addComponent(typeLabel)
                         .addComponent(typeSelector)
-                        .addComponent(lengthLabel)
                         .addComponent(lengthField)
-                        .addComponent(activeLengthLabel)
                         .addComponent(activeLengthField)
-                        .addComponent(thicknessLabel)
                         .addComponent(thicknessField)
         );
 
@@ -91,14 +73,14 @@ public class WallHelper extends JPanel {
     }
 
     public double getLengthValue() {
-        return Double.parseDouble(lengthField.getText());
+        return lengthField.getValue();
     }
 
     public double getActiveLengthValue() {
-        return Double.parseDouble(activeLengthField.getText());
+        return activeLengthField.getValue();
     }
 
     public double getThicknessValue() {
-        return Double.parseDouble(thicknessField.getText());
+        return thicknessField.getValue();
     }
 }
