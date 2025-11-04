@@ -5,17 +5,17 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class WaterFlowForm extends JPanel {
+public class WaterFlowForm extends JPanel implements ValidatableForm {
 
-    private GroupLayout layout;
+    private final GroupLayout layout;
 
-    private NumberField inletTemperatureField;
+    private final NumberField inletTemperatureField;
 
-    private NumberField outletTemperatureField;
+    private final NumberField outletTemperatureField;
 
-    private NumberField densityField;
+    private final NumberField densityField;
 
-    private NumberField conductivityField;
+    private final NumberField conductivityField;
 
     public WaterFlowForm() {
         super();
@@ -57,6 +57,15 @@ public class WaterFlowForm extends JPanel {
         ));
     }
 
+    @Override
+    public void validateForm() {
+        inletTemperatureField.validateField();
+        outletTemperatureField.validateField();
+        conductivityField.validateField();
+        densityField.validateField();
+    }
+
+    @Override
     public boolean isValidForm() {
         return inletTemperatureField.hasValidValue() && outletTemperatureField.hasInvalidValue() && conductivityField.hasValidValue() && densityField.hasValidValue();
     }

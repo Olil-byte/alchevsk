@@ -2,21 +2,21 @@ package lpr.olil.view;
 
 import javax.swing.*;
 
-public class CoolingParametersForm extends JScrollPane {
+public class CoolingParametersForm extends JScrollPane implements ValidatableForm {
 
-    private JPanel content;
+    private final JPanel content;
 
-    private BoxLayout layout;
+    private final BoxLayout layout;
 
-    private CcmForm ccmForm;
+    private final CcmForm ccmForm;
 
-    private SlabForm slabForm;
+    private final SlabForm slabForm;
 
-    private WallForm wallForm;
+    private final WallForm wallForm;
 
-    private DuctForm ductForm;
+    private final DuctForm ductForm;
 
-    private WaterFlowForm waterFlowForm;
+    private final WaterFlowForm waterFlowForm;
 
     public CoolingParametersForm() {
         content = new JPanel();
@@ -61,6 +61,15 @@ public class CoolingParametersForm extends JScrollPane {
         return ccmForm;
     }
 
+    @Override
+    public void validateForm() {
+        slabForm.validateForm();
+        wallForm.validateForm();
+        ductForm.validateForm();
+        ccmForm.validateForm();
+    }
+
+    @Override
     public boolean isValidForm() {
         return slabForm.isValidForm() && wallForm.isValidForm() && ductForm.isValidForm() && ccmForm.isValidForm();
     }

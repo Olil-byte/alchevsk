@@ -5,12 +5,12 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class DuctForm extends JPanel {
+public class DuctForm extends JPanel implements ValidatableForm {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
-    private GroupLayout layout;
+    private final GroupLayout layout;
 
-    private NumberField diameterField;
+    private final NumberField diameterField;
 
     public DuctForm() {
         super();
@@ -41,6 +41,12 @@ public class DuctForm extends JPanel {
         return diameterField.getValue();
     }
 
+    @Override
+    public void validateForm() {
+        diameterField.validateField();
+    }
+
+    @Override
     public boolean isValidForm() {
         return diameterField.hasValidValue();
     }

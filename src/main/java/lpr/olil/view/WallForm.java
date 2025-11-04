@@ -8,23 +8,23 @@ import lpr.olil.util.PositiveNumberValidator;
 import lpr.olil.util.WallActiveLengthValidator;
 import lpr.olil.util.WallLengthValidator;
 
-public class WallForm extends JPanel {
+public class WallForm extends JPanel implements ValidatableForm {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
     private static final int SMOOTHED = 0;
     private static final int PROFILED = 1;
     private static final String[] types = new String[]{"Гладкая", "Профилированная"};
 
-    private GroupLayout layout;
+    private final GroupLayout layout;
 
-    private JLabel typeLabel;
-    private JComboBox<String> typeSelector;
+    private final JLabel typeLabel;
+    private final JComboBox<String> typeSelector;
 
-    private NumberField lengthField;
+    private final NumberField lengthField;
 
-    private NumberField activeLengthField;
+    private final NumberField activeLengthField;
 
-    private NumberField thicknessField;
+    private final NumberField thicknessField;
 
     public WallForm() {
         super();
@@ -93,6 +93,14 @@ public class WallForm extends JPanel {
         return thicknessField.getValue();
     }
 
+    @Override
+    public void validateForm() {
+        lengthField.validateField();
+        activeLengthField.validateField();
+        thicknessField.validateField();
+    }
+
+    @Override
     public boolean isValidForm() {
         return lengthField.hasValidValue() && activeLengthField.hasValidValue() && thicknessField.hasValidValue();
     }

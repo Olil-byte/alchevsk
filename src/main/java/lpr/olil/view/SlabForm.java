@@ -5,13 +5,13 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class SlabForm extends JPanel {
+public class SlabForm extends JPanel implements ValidatableForm {
 
-    private GroupLayout layout;
+    private final GroupLayout layout;
 
-    private NumberField widthField;
+    private final NumberField widthField;
 
-    private NumberField lengthField;
+    private final NumberField lengthField;
 
     public SlabForm() {
         super();
@@ -51,6 +51,13 @@ public class SlabForm extends JPanel {
         return lengthField.getValue();
     }
 
+    @Override
+    public void validateForm() {
+        widthField.validateField();
+        lengthField.validateField();
+    }
+
+    @Override
     public boolean isValidForm() {
         return widthField.hasValidValue() && lengthField.hasValidValue();
     }

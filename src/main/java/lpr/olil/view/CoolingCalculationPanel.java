@@ -60,6 +60,8 @@ public class CoolingCalculationPanel extends JScrollPane {
     }
 
     private void handleCalculation(ActionEvent event) {
+        coolingParametersForm.validateForm();
+
         if (!coolingParametersForm.isValidForm()) {
             showValidationError();
             return;

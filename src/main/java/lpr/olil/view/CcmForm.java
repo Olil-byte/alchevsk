@@ -6,19 +6,19 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class CcmForm extends JPanel {
+public class CcmForm extends JPanel implements ValidatableForm{
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
-    private GroupLayout layout;
+    private final GroupLayout layout;
 
     private static final int CURVED = 0;
     private static final int VERTICAL = 1;
     private static final String[] geometries = new String[]{"Криволинейная", "Вертикальная"};
 
-    private JLabel geometryLabel;
-    private JComboBox<String> geometrySelector;
+    private final JLabel geometryLabel;
+    private final JComboBox<String> geometrySelector;
 
-    private NumberField castingSpeedField;
+    private final NumberField castingSpeedField;
 
     public CcmForm() {
         layout = new GroupLayout(this);
@@ -64,6 +64,12 @@ public class CcmForm extends JPanel {
         return castingSpeedField.getValue();
     }
 
+    @Override
+    public void validateForm() {
+        castingSpeedField.validateField();
+    }
+
+    @Override
     public boolean isValidForm() {
         return castingSpeedField.hasValidValue();
     }

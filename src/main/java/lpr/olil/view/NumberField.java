@@ -17,8 +17,8 @@ public class NumberField extends JPanel {
     private static final String NAN_ERROR_TOOLTIP = "Введённое значение не является числом!";
     private static final Icon ERROR_ICON = createErrorIcon();
 
-    private ArrayList<NumberValidator> validators;
-    private StringBuilder tooltipBuilder;
+    private final ArrayList<NumberValidator> validators;
+    private final StringBuilder tooltipBuilder;
 
     private boolean isValidValue;
 
@@ -117,7 +117,7 @@ public class NumberField extends JPanel {
         validators.add(validator);
     }
 
-    private void validateField() {
+    public void validateField() {
         resetAppearance();
 
         try {
