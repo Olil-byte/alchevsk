@@ -14,7 +14,7 @@ public class NumberParameterField extends JPanel {
     private static final Color ERROR_HIGHLIGHT = new Color(255, 220, 220);
     private static final String ERROR_TOOLTIP = "Введённое значение не является числом";
 
-    private final Icon errorIcon;
+    private static final Icon ERROR_ICON = getErrorIconInstance();
 
     BoxLayout layout;
 
@@ -93,9 +93,7 @@ public class NumberParameterField extends JPanel {
 
         labelPanel.add(Box.createHorizontalGlue());
 
-        errorIcon = createErrorIcon();
-
-        icon = new JLabel(errorIcon);
+        icon = new JLabel(ERROR_ICON);
         icon.setVerticalAlignment(SwingConstants.CENTER);
         icon.setVisible(false);
 
@@ -117,7 +115,7 @@ public class NumberParameterField extends JPanel {
         value = Optional.empty();
     }
 
-    private Icon createErrorIcon() {
+    private static Icon getErrorIconInstance() {
         final ImageIcon errorIcon = (ImageIcon)UIManager.getIcon("OptionPane.errorIcon");
 
         final Image image = errorIcon.getImage();
