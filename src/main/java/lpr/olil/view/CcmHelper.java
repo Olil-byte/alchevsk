@@ -1,6 +1,7 @@
 package lpr.olil.view;
 
 import lpr.olil.model.CcmBuilder;
+import lpr.olil.util.PositiveNumberValidator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +18,7 @@ public class CcmHelper extends JPanel {
     private JLabel geometryLabel;
     private JComboBox<String> geometrySelector;
 
-    private NumberParameterField castingSpeedField;
+    private NumberField castingSpeedField;
 
     public CcmHelper() {
         layout = new GroupLayout(this);
@@ -28,7 +29,8 @@ public class CcmHelper extends JPanel {
         geometrySelector = new JComboBox<>(geometries);
         geometrySelector.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
-        castingSpeedField = new NumberParameterField("Скорость разливки (м/мин)");
+        castingSpeedField = new NumberField("Скорость разливки (м/мин)");
+        castingSpeedField.addValidator(new PositiveNumberValidator("Скорость разливки должна быть больше нуля!"));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -60,6 +62,10 @@ public class CcmHelper extends JPanel {
 
     public double getCastingSpeedValue() {
         return castingSpeedField.getValue();
+    }
+
+    public boolean isValidForm() {
+        return castingSpeedField.hasValidValue();
     }
 
 }

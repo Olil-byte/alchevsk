@@ -1,5 +1,7 @@
 package lpr.olil.view;
 
+import lpr.olil.util.PositiveNumberValidator;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -7,9 +9,9 @@ public class SlabHelper extends JPanel {
 
     private GroupLayout layout;
 
-    private NumberParameterField widthField;
+    private NumberField widthField;
 
-    private NumberParameterField lengthField;
+    private NumberField lengthField;
 
     public SlabHelper() {
         super();
@@ -17,9 +19,11 @@ public class SlabHelper extends JPanel {
         layout = new GroupLayout(this);
         setLayout(layout);
 
-        widthField = new NumberParameterField("Ширина (м)");
+        widthField = new NumberField("Ширина (м)");
+        widthField.addValidator(new PositiveNumberValidator("Ширина должна быть больше нуля!"));
 
-        lengthField = new NumberParameterField("Длина (м)");
+        lengthField = new NumberField("Длина (м)");
+        lengthField.addValidator(new PositiveNumberValidator("Длина должна быть больше нуля!"));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -45,5 +49,9 @@ public class SlabHelper extends JPanel {
 
     public double getLengthValue() {
         return lengthField.getValue();
+    }
+
+    public boolean isValidForm() {
+        return widthField.hasValidValue() && lengthField.hasValidValue();
     }
 }

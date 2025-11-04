@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class CoolingCalculationPanel extends JScrollPane {
@@ -23,20 +24,8 @@ public class CoolingCalculationPanel extends JScrollPane {
 
     private class ButtonController implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e) {
-            final SlabHelper slabHelper = coolingParametersPanel.getSlabHelper();
-
-            Slab slab = null;
-
-            try {
-                final double width = slabHelper.getWidthValue();
-                final double length = slabHelper.getLengthValue();
-
-                slab = new Slab(width, length);
-
-            } catch (RuntimeException re) {
-                System.out.println(re);
-            }
+        public void actionPerformed(ActionEvent event) {
+            Slab slab = createSlab();
 
             final WallHelper wallHelper = coolingParametersPanel.getWallHelper();
 
@@ -94,13 +83,22 @@ public class CoolingCalculationPanel extends JScrollPane {
             }
 
             final DuctCalculator.Result ductCalculationResult = DuctCalculator.calculateDuctCount(
-                    Objects.requireNonNull(slab),
+                    slab,
                     Objects.requireNonNull(ccm)
             );
 
             ductCountField.setText(Double.toString(ductCalculationResult.ductCount));
-            distanceBetweenDuctsField.setText(Double.toString(ductCalculationResult.distanceBetweenDucts));
+            //distanceBetweenDuctsField.setText(Double.toString(ductCalculationResult.distanceBetweenDucts));
         }
+    }
+
+    private Slab createSlab() {
+        final SlabHelper slabHelper = coolingParametersPanel.getSlabHelper();
+
+        final double width = slabHelper.getWidthValue();
+        final double length = slabHelper.getLengthValue();
+
+        return new Slab(width, length);
     }
 
     ButtonController buttonController;
@@ -109,7 +107,7 @@ public class CoolingCalculationPanel extends JScrollPane {
     JTextField ductCountField;
 
     JLabel distanceBetweenDuctsLabel;
-    JTextField distanceBetweenDuctsField;
+    //JTextField distanceBetweenDuctsField;
 
     public CoolingCalculationPanel(CoolingParametersPanel coolingParametersPanel) {
         this.coolingParametersPanel = coolingParametersPanel;
@@ -127,14 +125,15 @@ public class CoolingCalculationPanel extends JScrollPane {
 
         ductCountField = new JTextField();
         ductCountField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        ductCountField.setEditable(false);
         content.add(ductCountField);
 
-        distanceBetweenDuctsLabel = new JLabel("Расстояние между каналами (м)");
-        content.add(distanceBetweenDuctsLabel);
+//        distanceBetweenDuctsLabel = new JLabel("Расстояние между каналами (м)");
+//        content.add(distanceBetweenDuctsLabel);
 
-        distanceBetweenDuctsField = new JTextField();
-        distanceBetweenDuctsField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
-        content.add(distanceBetweenDuctsField);
+//        distanceBetweenDuctsField = new JTextField();
+//        distanceBetweenDuctsField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+//        content.add(distanceBetweenDuctsField);
 
         calculateButton = new JButton("Расчитать");
         content.add(calculateButton);

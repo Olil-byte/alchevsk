@@ -1,5 +1,7 @@
 package lpr.olil.view;
 
+import lpr.olil.util.PositiveNumberValidator;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -7,13 +9,13 @@ public class WaterFlowHelper extends JPanel {
 
     private GroupLayout layout;
 
-    private NumberParameterField inletTemperatureField;
+    private NumberField inletTemperatureField;
 
-    private NumberParameterField outletTemperatureField;
+    private NumberField outletTemperatureField;
 
-    private NumberParameterField densityField;
+    private NumberField densityField;
 
-    private NumberParameterField conductivityField;
+    private NumberField conductivityField;
 
     public WaterFlowHelper() {
         super();
@@ -21,13 +23,17 @@ public class WaterFlowHelper extends JPanel {
         layout = new GroupLayout(this);
         setLayout(layout);
 
-        inletTemperatureField = new NumberParameterField("Температура на входе (\u00B0C)");
+        inletTemperatureField = new NumberField("Температура на входе (\u00B0C)");
+        inletTemperatureField.addValidator(new PositiveNumberValidator("Температура на входе должна быть больше нуля!"));
 
-        outletTemperatureField = new NumberParameterField("Температура на выходе (\u00B0C)");
+        outletTemperatureField = new NumberField("Температура на выходе (\u00B0C)");
+        outletTemperatureField.addValidator(new PositiveNumberValidator("Температура на выходе должна быть больше нуля!"));
 
-        densityField = new NumberParameterField("Плотность (кг/м\u00B3)");
+        densityField = new NumberField("Плотность (кг/м\u00B3)");
+        outletTemperatureField.addValidator(new PositiveNumberValidator("Плотность должна быть больше нуля!"));
 
-        conductivityField = new NumberParameterField("Теплопроводность (Дж/(кг\u22C5К))");
+        conductivityField = new NumberField("Теплопроводность (Дж/(кг\u22C5К))");
+        conductivityField.addValidator(new PositiveNumberValidator("Теплопроводность должна быть больше нуля!"));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -49,5 +55,9 @@ public class WaterFlowHelper extends JPanel {
                 BorderFactory.createLineBorder(Color.BLACK),
                 "Охлаждающая жидкость"
         ));
+    }
+
+    public boolean isValidForm() {
+        return inletTemperatureField.hasValidValue() && outletTemperatureField.hasInvalidValue() && conductivityField.hasValidValue() && densityField.hasValidValue();
     }
 }

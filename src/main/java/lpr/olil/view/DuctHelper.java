@@ -1,5 +1,7 @@
 package lpr.olil.view;
 
+import lpr.olil.util.PositiveNumberValidator;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,7 +10,7 @@ public class DuctHelper extends JPanel {
 
     private GroupLayout layout;
 
-    private NumberParameterField diameterField;
+    private NumberField diameterField;
 
     public DuctHelper() {
         super();
@@ -16,7 +18,8 @@ public class DuctHelper extends JPanel {
         layout = new GroupLayout(this);
         setLayout(layout);
 
-        diameterField = new NumberParameterField("Диаметр (м)");
+        diameterField = new NumberField("Диаметр (м)");
+        diameterField.addValidator(new PositiveNumberValidator("Диаметр должен быть больше нуля!"));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -36,5 +39,9 @@ public class DuctHelper extends JPanel {
 
     public double getDiameterValue() {
         return diameterField.getValue();
+    }
+
+    public boolean isValidForm() {
+        return diameterField.hasValidValue();
     }
 }

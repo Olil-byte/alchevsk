@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 
 import lpr.olil.model.WallBuilder;
+import lpr.olil.util.PositiveNumberValidator;
+import lpr.olil.util.WallActiveLengthValidator;
+import lpr.olil.util.WallLengthValidator;
 
 public class WallHelper extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
@@ -17,11 +20,11 @@ public class WallHelper extends JPanel {
     private JLabel typeLabel;
     private JComboBox<String> typeSelector;
 
-    private NumberParameterField lengthField;
+    private NumberField lengthField;
 
-    private NumberParameterField activeLengthField;
+    private NumberField activeLengthField;
 
-    private NumberParameterField thicknessField;
+    private NumberField thicknessField;
 
     public WallHelper() {
         super();
@@ -34,11 +37,17 @@ public class WallHelper extends JPanel {
         typeSelector = new JComboBox<>(types);
         typeSelector.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
 
-        lengthField = new NumberParameterField("Длина (м)");
+        lengthField = new NumberField("Длина (м)");
+        lengthField.addValidator(new PositiveNumberValidator("Длина должна быть больше нуля!"));
 
-        activeLengthField = new NumberParameterField("Активная длина (м)");
+        activeLengthField = new NumberField("Активная длина (м)");
+        activeLengthField.addValidator(new PositiveNumberValidator("Активная длина должна быть больше нуля!"));
 
-        thicknessField = new NumberParameterField("Толщина (м)");
+        lengthField.addValidator(new WallLengthValidator(activeLengthField));
+        activeLengthField.addValidator(new WallActiveLengthValidator(lengthField));
+
+        thicknessField = new NumberField("Толщина (м)");
+        thicknessField.addValidator(new PositiveNumberValidator("Толщина должна быть больше нуля!"));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -82,5 +91,9 @@ public class WallHelper extends JPanel {
 
     public double getThicknessValue() {
         return thicknessField.getValue();
+    }
+
+    public boolean isValidForm() {
+        return lengthField.hasValidValue() && activeLengthField.hasValidValue() && thicknessField.hasValidValue();
     }
 }
