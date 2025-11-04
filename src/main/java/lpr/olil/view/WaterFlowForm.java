@@ -5,7 +5,7 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class WaterFlowHelper extends JPanel {
+public class WaterFlowForm extends JPanel {
 
     private GroupLayout layout;
 
@@ -17,7 +17,7 @@ public class WaterFlowHelper extends JPanel {
 
     private NumberField conductivityField;
 
-    public WaterFlowHelper() {
+    public WaterFlowForm() {
         super();
 
         layout = new GroupLayout(this);

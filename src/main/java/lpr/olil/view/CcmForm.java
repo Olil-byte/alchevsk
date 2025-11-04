@@ -6,7 +6,7 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class CcmHelper extends JPanel {
+public class CcmForm extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
     private GroupLayout layout;
@@ -20,7 +20,7 @@ public class CcmHelper extends JPanel {
 
     private NumberField castingSpeedField;
 
-    public CcmHelper() {
+    public CcmForm() {
         layout = new GroupLayout(this);
         setLayout(layout);
 

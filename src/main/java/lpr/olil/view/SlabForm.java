@@ -5,7 +5,7 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class SlabHelper extends JPanel {
+public class SlabForm extends JPanel {
 
     private GroupLayout layout;
 
@@ -13,7 +13,7 @@ public class SlabHelper extends JPanel {
 
     private NumberField lengthField;
 
-    public SlabHelper() {
+    public SlabForm() {
         super();
 
         layout = new GroupLayout(this);

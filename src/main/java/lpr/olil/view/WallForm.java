@@ -8,7 +8,7 @@ import lpr.olil.util.PositiveNumberValidator;
 import lpr.olil.util.WallActiveLengthValidator;
 import lpr.olil.util.WallLengthValidator;
 
-public class WallHelper extends JPanel {
+public class WallForm extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
     private static final int SMOOTHED = 0;
@@ -26,7 +26,7 @@ public class WallHelper extends JPanel {
 
     private NumberField thicknessField;
 
-    public WallHelper() {
+    public WallForm() {
         super();
 
         layout = new GroupLayout(this);

@@ -6,140 +6,130 @@ import lpr.olil.model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class CoolingCalculationPanel extends JScrollPane {
 
     private static final int MAX_COMPONENT_HEIGHT = 20;
+    private static final String DUCT_COUNT_LABEL = "Количество каналов (шт.)";
+    private static final String CALCULATE_BUTTON_TEXT = "Рассчитать";
 
-    private CoolingParametersPanel coolingParametersPanel;
+    private final CoolingParametersForm coolingParametersForm;
+    private final JPanel content;
+    private final JTextField ductCountField;
 
-    private JPanel content;
+    public CoolingCalculationPanel(CoolingParametersForm coolingParametersForm) {
+        this.coolingParametersForm = Objects.requireNonNull(coolingParametersForm,
+                "CoolingParametersForm cannot be null");
 
-    private BoxLayout layout;
+        this.content = createContentPanel();
+        this.ductCountField = createDuctCountField();
 
-    private JButton calculateButton;
+        setupUI();
+    }
 
-    private class ButtonController implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            Slab slab = createSlab();
+    private JPanel createContentPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        return panel;
+    }
 
-            final WallHelper wallHelper = coolingParametersPanel.getWallHelper();
+    private JTextField createDuctCountField() {
+        JTextField field = new JTextField();
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        field.setEditable(false);
+        return field;
+    }
 
-            Wall wall = null;
+    private void setupUI() {
+        addDuctCountComponents();
+        addCalculateButton();
+        setViewportView(content);
+    }
 
-            try {
-                final WallBuilder.Type type = wallHelper.getSelectedType();
+    private void addDuctCountComponents() {
+        JLabel label = new JLabel(DUCT_COUNT_LABEL);
+        content.add(label);
+        content.add(ductCountField);
+    }
 
-                final double length = wallHelper.getLengthValue();
-                final double activeLength = wallHelper.getActiveLengthValue();
-                final double thickness = wallHelper.getThicknessValue();
+    private void addCalculateButton() {
+        JButton button = new JButton(CALCULATE_BUTTON_TEXT);
+        button.addActionListener(this::handleCalculation);
+        content.add(button);
+    }
 
-                WallBuilder builder = new WallBuilder();
+    private void handleCalculation(ActionEvent event) {
+        if (!coolingParametersForm.isValidForm()) {
+            showValidationError();
+            return;
+        }
 
-                wall = builder.ofType(type)
-                        .withLength(length)
-                        .withActiveLength(activeLength)
-                        .withThickness(thickness)
-                        .build();
-
-            } catch (RuntimeException re) {
-                System.out.println(re);
-            }
-
-            final DuctHelper ductHelper = coolingParametersPanel.getDuctHelper();
-
-            Crystallizer crystallizer = null;
-
-            try {
-                final double ductDiameter = ductHelper.getDiameterValue();
-
-                crystallizer = new Crystallizer(wall, ductDiameter);
-
-            } catch (RuntimeException re) {
-                System.out.println(re);
-            }
-
-            CcmHelper ccmHelper = coolingParametersPanel.getCcmHelper();
-
-            Ccm ccm = null;
-
-            try {
-                final CcmBuilder.Geometry geometry = ccmHelper.getSelectedGeometryType();
-
-                final double castingSpeed = ccmHelper.getCastingSpeedValue();
-
-                CcmBuilder builder = new CcmBuilder();
-
-                ccm = builder.withGeometry(geometry)
-                        .withCastingSpeed(castingSpeed)
-                        .withCrystallizer(crystallizer)
-                        .build();
-            } catch (RuntimeException re) {
-                System.out.println(re);
-            }
-
-            final DuctCalculator.Result ductCalculationResult = DuctCalculator.calculateDuctCount(
-                    slab,
-                    Objects.requireNonNull(ccm)
-            );
-
-            ductCountField.setText(Double.toString(ductCalculationResult.ductCount));
-            //distanceBetweenDuctsField.setText(Double.toString(ductCalculationResult.distanceBetweenDucts));
+        try {
+            performCalculation();
+        } catch (Exception e) {
+            handleCalculationError(e);
         }
     }
 
-    private Slab createSlab() {
-        final SlabHelper slabHelper = coolingParametersPanel.getSlabHelper();
-
-        final double width = slabHelper.getWidthValue();
-        final double length = slabHelper.getLengthValue();
-
-        return new Slab(width, length);
+    private void showValidationError() {
+        JOptionPane.showMessageDialog(this,
+                "Пожалуйста, заполните все поля корректно",
+                "Ошибка валидации",
+                JOptionPane.ERROR_MESSAGE);
     }
 
-    ButtonController buttonController;
+    private void handleCalculationError(Exception e) {
+        String errorMessage = String.format("Ошибка при расчете: %s", e.getMessage());
+        JOptionPane.showMessageDialog(this,
+                errorMessage,
+                "Ошибка расчета",
+                JOptionPane.ERROR_MESSAGE);
+        ductCountField.setText("");
+    }
 
-    JLabel ductCountLabel;
-    JTextField ductCountField;
+    private void performCalculation() {
+        Slab slab = createSlab();
+        Wall wall = createWall();
+        Crystallizer crystallizer = createCrystallizer(wall);
+        Ccm ccm = createCcm(crystallizer);
 
-    JLabel distanceBetweenDuctsLabel;
-    //JTextField distanceBetweenDuctsField;
+        DuctCalculator.Result result = DuctCalculator.calculateDuctCount(slab, ccm);
+        displayResult(result);
+    }
 
-    public CoolingCalculationPanel(CoolingParametersPanel coolingParametersPanel) {
-        this.coolingParametersPanel = coolingParametersPanel;
+    private void displayResult(DuctCalculator.Result result) {
+        ductCountField.setText(Integer.toString(result.ductCount));
+    }
 
-        buttonController = new ButtonController();
+    private Slab createSlab() {
+        SlabForm slabForm = coolingParametersForm.getSlabForm();
+        return new Slab(slabForm.getWidthValue(), slabForm.getLengthValue());
+    }
 
-        content = new JPanel();
+    private Wall createWall() {
+        WallForm wallForm = coolingParametersForm.getWallForm();
 
-        layout = new BoxLayout(content, BoxLayout.Y_AXIS);
+        return new WallBuilder()
+                .ofType(wallForm.getSelectedType())
+                .withLength(wallForm.getLengthValue())
+                .withActiveLength(wallForm.getActiveLengthValue())
+                .withThickness(wallForm.getThicknessValue())
+                .build();
+    }
 
-        content.setLayout(layout);
+    private Crystallizer createCrystallizer(Wall wall) {
+        DuctForm ductForm = coolingParametersForm.getDuctForm();
+        return new Crystallizer(wall, ductForm.getDiameterValue());
+    }
 
-        ductCountLabel = new JLabel("Количество каналов (шт.)");
-        content.add(ductCountLabel);
+    private Ccm createCcm(Crystallizer crystallizer) {
+        CcmForm ccmForm = coolingParametersForm.getCcmForm();
 
-        ductCountField = new JTextField();
-        ductCountField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
-        ductCountField.setEditable(false);
-        content.add(ductCountField);
-
-//        distanceBetweenDuctsLabel = new JLabel("Расстояние между каналами (м)");
-//        content.add(distanceBetweenDuctsLabel);
-
-//        distanceBetweenDuctsField = new JTextField();
-//        distanceBetweenDuctsField.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
-//        content.add(distanceBetweenDuctsField);
-
-        calculateButton = new JButton("Расчитать");
-        content.add(calculateButton);
-
-        calculateButton.addActionListener(buttonController);
-
-        setViewportView(content);
+        return new CcmBuilder()
+                .withGeometry(ccmForm.getSelectedGeometryType())
+                .withCastingSpeed(ccmForm.getCastingSpeedValue())
+                .withCrystallizer(crystallizer)
+                .build();
     }
 }

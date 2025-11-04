@@ -5,14 +5,14 @@ import lpr.olil.util.PositiveNumberValidator;
 import javax.swing.*;
 import java.awt.*;
 
-public class DuctHelper extends JPanel {
+public class DuctForm extends JPanel {
     private static final int MAX_COMPONENT_HEIGHT = 20;
 
     private GroupLayout layout;
 
     private NumberField diameterField;
 
-    public DuctHelper() {
+    public DuctForm() {
         super();
 
         layout = new GroupLayout(this);

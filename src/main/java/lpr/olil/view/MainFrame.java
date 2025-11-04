@@ -6,7 +6,7 @@ public class MainFrame extends JFrame {
     public MainFrame(String title) {
         super(title);
 
-        CoolingParametersPanel parameters = new CoolingParametersPanel();
+        CoolingParametersForm parameters = new CoolingParametersForm();
 
         JScrollPane calculator = new CoolingCalculationPanel(parameters);
 
