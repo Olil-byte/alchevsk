@@ -57,6 +57,22 @@ public class WaterFlowForm extends JPanel implements ValidatableForm {
         ));
     }
 
+    public double getInletTemperatureValue() {
+        return inletTemperatureField.getValue();
+    }
+
+    public double getOutletTemperatureValue() {
+        return outletTemperatureField.getValue();
+    }
+
+    public double getConductivityValue() {
+        return conductivityField.getValue();
+    }
+
+    public double getDensityValue() {
+        return densityField.getValue();
+    }
+
     @Override
     public void validateForm() {
         inletTemperatureField.validateField();

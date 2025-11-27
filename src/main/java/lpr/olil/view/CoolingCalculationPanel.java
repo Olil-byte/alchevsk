@@ -3,10 +3,15 @@ package lpr.olil.view;
 import lpr.olil.calculator.DuctCalculator;
 import lpr.olil.model.*;
 
+import lpr.olil.user.UserDb;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.*;
 import java.util.Objects;
+
+import java.sql.PreparedStatement;
 
 public class CoolingCalculationPanel extends JScrollPane {
 
@@ -18,9 +23,13 @@ public class CoolingCalculationPanel extends JScrollPane {
     private final JPanel content;
     private final JTextField ductCountField;
 
-    public CoolingCalculationPanel(CoolingParametersForm coolingParametersForm) {
+    private final CoolingHistoryPanel historyPanel;
+
+    public CoolingCalculationPanel(CoolingParametersForm coolingParametersForm, CoolingHistoryPanel historyPanel) {
         this.coolingParametersForm = Objects.requireNonNull(coolingParametersForm,
                 "CoolingParametersForm cannot be null");
+
+        this.historyPanel = historyPanel;
 
         this.content = createContentPanel();
         this.ductCountField = createDuctCountField();
@@ -98,6 +107,57 @@ public class CoolingCalculationPanel extends JScrollPane {
 
         DuctCalculator.Result result = DuctCalculator.calculateDuctCount(slab, ccm);
         displayResult(result);
+
+        WaterFlow waterFlow = createWaterFlow();
+
+        // add to history
+        if (UserDb.INSTANCE != null) {
+            Connection dbConnection = UserDb.INSTANCE.getConnection();
+            try {
+                String sql =
+                        """
+                            INSERT INTO alchevsk.cooling_history (
+                                ccm_geometry,
+                                slab_width,
+                                slab_height,
+                                wall_type,
+                                wall_length,
+                                wall_active_length,
+                                wall_thickness,
+                                duct_diameter,
+                                inlet_temperature,
+                                outlet_temperature,
+                                water_density,
+                                water_conductivity
+                               ) VALUES (?::alchevsk.ccm_geometry, ?, ?, ?::alchevsk.wall_type, ?, ?, ?, ?, ?, ?, ?, ?);
+                        """;
+
+                java.sql.PreparedStatement statement = dbConnection.prepareStatement(sql);
+
+                statement.setString(1, (ccm instanceof VerticalCcm ? "vertical" : "curved"));
+
+                statement.setDouble(2, slab.getWidth());
+                statement.setDouble(3, slab.getLength());
+
+                statement.setString(4, (wall instanceof SmoothedWall ? "smoothed" : "profiled"));
+                statement.setDouble(5, wall.getLength());
+                statement.setDouble(6, wall.getActiveLength());
+                statement.setDouble(7, wall.getThickness());
+
+                statement.setDouble(8, crystallizer.getDuctDiameter());
+
+                statement.setDouble(9, waterFlow.getInletTemperature());
+                statement.setDouble(10, waterFlow.getOutletTemperature());
+                statement.setDouble(11, waterFlow.getDensity());
+                statement.setDouble(12, waterFlow.getConductivity());
+
+                ResultSet results = statement.executeQuery();
+
+                historyPanel.refresh();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void displayResult(DuctCalculator.Result result) {
@@ -133,5 +193,16 @@ public class CoolingCalculationPanel extends JScrollPane {
                 .withCastingSpeed(ccmForm.getCastingSpeedValue())
                 .withCrystallizer(crystallizer)
                 .build();
+    }
+
+    private WaterFlow createWaterFlow() {
+        WaterFlowForm waterFlowForm = coolingParametersForm.getWaterFlowForm();
+
+        return new WaterFlow(
+                waterFlowForm.getInletTemperatureValue(),
+                waterFlowForm.getOutletTemperatureValue(),
+                waterFlowForm.getDensityValue(),
+                waterFlowForm.getConductivityValue()
+        );
     }
 }

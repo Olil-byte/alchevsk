@@ -2,9 +2,12 @@ package lpr.olil;
 
 import lpr.olil.calculator.*;
 import lpr.olil.model.*;
+import lpr.olil.user.UserDb;
 import lpr.olil.view.MainFrame;
 
 import javax.swing.*;
+
+import java.sql.*;
 
 public class App {
     // main frame
@@ -21,12 +24,6 @@ public class App {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
 
         final double ductDiameter = 0.02;
 
@@ -54,5 +51,24 @@ public class App {
 
         System.out.println(waterFlowCalculationResult.flowVelocity);
         System.out.println(waterFlowCalculationResult.consumption);
+
+//        try {
+//            Connection dbConnection = DriverManager.getConnection(
+//                    "jdbc:postgresql://localhost:5432/alchevsk",
+//                    "test",
+//                    "1234"
+//            );
+//
+//            UserDb user = new UserDb(dbConnection);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                createAndShowGUI();
+            }
+        });
     }
 }

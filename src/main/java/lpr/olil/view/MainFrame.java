@@ -3,19 +3,33 @@ package lpr.olil.view;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
+    private final JTabbedPane tabs;
+
+    private final CoolingTab coolingTab;
+
+    private final JSplitPane temperatureTab;
+
     public MainFrame(String title) {
         super(title);
 
-        CoolingParametersForm parameters = new CoolingParametersForm();
+        tabs = new JTabbedPane(JTabbedPane.TOP);
 
-        JScrollPane calculator = new CoolingCalculationPanel(parameters);
+        coolingTab = new CoolingTab();
 
-        JSplitPane splitPanel = new JSplitPane(
+        tabs.addTab("Охлаждение", coolingTab);
+
+        TemperatureParametersForm temperatureParameters = new TemperatureParametersForm();
+
+        JScrollPane temperatureCalculator = new TemperatureCalculationPanel(temperatureParameters);
+
+        temperatureTab = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
-                parameters,
-                calculator
+                temperatureParameters,
+                temperatureCalculator
         );
 
-        add(splitPanel);
+        tabs.addTab("Температура", temperatureTab);
+
+        add(tabs);
     }
 }

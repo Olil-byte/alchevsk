@@ -61,6 +61,10 @@ public class CoolingParametersForm extends JScrollPane implements ValidatableFor
         return ccmForm;
     }
 
+    public WaterFlowForm getWaterFlowForm() {
+        return waterFlowForm;
+    }
+
     @Override
     public void validateForm() {
         slabForm.validateForm();

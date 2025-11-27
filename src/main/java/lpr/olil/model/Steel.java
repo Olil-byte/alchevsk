@@ -19,72 +19,145 @@ class InvalidSteelException extends RuntimeException {
 }
 
 public class Steel extends Metal {
-//    private static final Map<Double, Double> LIQUIDUS_BY_CARBON = Map.ofEntries(
-//            entry(0.0000, 1539.0),
-//            entry(0.0005, 1536.0),
-//            entry(0.0010, 1532.0),
-//            entry(0.0015, 1529.0),
-//            entry(0.0020, 1526.0),
-//            entry(0.0025, 1522.0),
-//            entry(0.0030, 1519.0),
-//            entry(0.0035, 1516.0),
-//            entry(0.0040, 1512.0),
-//            entry(0.0045, 1509.0),
-//            entry(0.0050, 1505.0),
-//            entry(0.0055, 1502.0),
-//            entry(0.0060, 1499.0),
-//            entry(0.0065, 1495.0),
-//            entry(0.0070, 1492.0),
-//            entry(0.0080, 1485.0),
-//            entry(0.0090, 1479.0),
-//            entry(0.0100, 1469.0),
-//            entry(0.0110, 1459.0),
-//            entry(0.0120, 1452.0),
-//            entry(0.0130, 1445.0)
-//    );
-//
-//    private double interpolateLiquidus() {
-//        if (LIQUIDUS_BY_CARBON.containsKey(carbonConcentration)) {
-//            return LIQUIDUS_BY_CARBON.get(carbonConcentration);
-//        }
-//
-//        Set<Double> keySet = LIQUIDUS_BY_CARBON.keySet();
-//
-//        Double left = null;
-//        Double right = null;
-//
-//        for (Double carbon : keySet) {
-//            if (carbon < carbonConcentration) {
-//                if (left == null || carbon > left) {
-//                    left = carbon;
-//                }
-//            }
-//
-//            if (carbon > carbonConcentration) {
-//                if (right == null || carbon < right) {
-//                    right = carbon;
-//                }
-//            }
-//        }
-//
-//        if (left == null || right == null) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        final double solidusLeft = LIQUIDUS_BY_CARBON.get(left);
-//        final double solidusRight = LIQUIDUS_BY_CARBON.get(right);
-//
-//        return solidusLeft + (carbonConcentration - left) *
-//                (solidusRight - solidusLeft) / (right - left);
-//    }
-
+    private final double hydrogen;
+    private final double nitrogen;
+    private final double oxygen;
     private final double carbon;
+    private final double phosphor;
+    private final double sulfur;
+    private final double arsenic;
+    private final double lead;
+    private final double silicon;
+    private final double manganese;
+    private final double copper;
+    private final double nickel;
+    private final double molybdenum;
+    private final double vanadium;
+    private final double chromium;
+    private final double aluminum;
+    private final double tungsten;
 
     private final double liquidus; // K
     private final double solidus; // K
 
-    public Steel (double carbon) {
+    public Steel(
+            double hydrogen,
+            double nitrogen,
+            double oxygen,
+            double carbon,
+            double phosphor,
+            double sulfur,
+            double arsenic,
+            double lead,
+            double silicon,
+            double manganese,
+            double copper,
+            double nickel,
+            double molybdenum,
+            double vanadium,
+            double chromium,
+            double aluminum,
+            double tungsten
+    ) {
+        this.hydrogen = hydrogen;
+        this.nitrogen = nitrogen;
+        this.oxygen = oxygen;
         this.carbon = carbon;
+        this.phosphor = phosphor;
+        this.sulfur = sulfur;
+        this.arsenic = arsenic;
+        this.lead = lead;
+        this.silicon = silicon;
+        this.manganese = manganese;
+        this.copper = copper;
+        this.nickel = nickel;
+        this.molybdenum = molybdenum;
+        this.vanadium = vanadium;
+        this.chromium = chromium;
+        this.aluminum = aluminum;
+        this.tungsten = tungsten;
+
+        double deltaT = 0.0;
+
+        if (this.hydrogen >= 0.0 && this.hydrogen <= 1.0e-3) {
+            deltaT += 1300.0 * this.hydrogen;
+        }
+
+        if (this.nitrogen >= 0.0 && this.nitrogen <= 0.03) {
+            deltaT += 90.0 * this.nitrogen;
+        }
+
+        if (this.oxygen >= 0.0 && this.oxygen <= 0.03) {
+            deltaT += 80.0 * this.oxygen;
+        }
+
+        if (this.carbon >= 0 && this.carbon < 1.0) {
+            deltaT += 65.0 * this.carbon;
+        } else if (this.carbon >= 1.0 && this.carbon < 2.0) {
+            deltaT += 70.0 * this.carbon;
+        } else if (this.carbon >= 2.0 && this.carbon < 2.5) {
+            deltaT += 75.0 * this.carbon;
+        } else if (this.carbon >= 2.5 && this.carbon < 3.0) {
+            deltaT += 80.0 * this.carbon;
+        } else if (this.carbon >= 3.0 && this.carbon < 3.5) {
+            deltaT += 85.0 * this.carbon;
+        } else if (this.carbon >= 3.5 && this.carbon < 4.0) {
+            deltaT += 91.0 * this.carbon;
+        } else if (this.carbon >= 4.0) {
+            deltaT += 100.0 * this.carbon;
+        }
+
+        if (this.phosphor >= 0.0 && this.phosphor <= 0.7) {
+            deltaT += 30.0 * this.phosphor;
+        }
+
+        if (this.sulfur >= 0.0 && this.sulfur <= 0.08) {
+            deltaT += 25.0 * this.phosphor;
+        }
+
+        if (this.arsenic >= 0.0 && this.arsenic <= 0.5) {
+            deltaT += 14.0 * this.arsenic;
+        }
+
+        if (this.lead >= 0.0 && this.lead <= 0.3) {
+            deltaT += 10.0 * this.lead;
+        }
+
+        if (this.silicon >= 0.0 && this.silicon <= 3.0) {
+            deltaT += 12.0 * this.silicon;
+        }
+
+        if (this.manganese >= 0.0 && this.manganese <= 1.5) {
+            deltaT += 5.0 * this.manganese;
+        }
+
+        if (this.copper >= 0.0 && this.copper <= 0.3) {
+            deltaT += 5.0 * this.copper;
+        }
+
+        if (this.nickel >= 0.0 && this.nickel <= 9.0) {
+            deltaT += 4.0 * this.nickel;
+        }
+
+        if (this.molybdenum >= 0.0 && this.molybdenum <= 0.3) {
+            deltaT += 2.0 * this.molybdenum;
+        }
+
+        if (this.vanadium >= 0.0 && this.vanadium <= 1.0) {
+            deltaT += 2.0 * this.vanadium;
+        }
+
+        if (this.chromium >= 0.0 && this.chromium <= 18.0) {
+            deltaT += 1.5 * this.chromium;
+        }
+
+        if (this.aluminum >= 0.0 && this.aluminum <= 1.0) {
+            deltaT += 1.0 * this.aluminum;
+        }
+
+        if (this.tungsten == 18.0) {
+            deltaT += 1.0 * this.tungsten;
+        }
 
         final boolean isNegativeCarbon = carbon < 0.0;
         final boolean isCarbonMoreThan100Percents = carbon > 1.0;
