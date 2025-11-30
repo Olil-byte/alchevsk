@@ -1,12 +1,8 @@
 package lpr.olil.view;
 
-import lpr.olil.user.UserDb;
-
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-public class CoolingTab extends JTabbedPane implements ChangeListener {
+public class CoolingTab extends JTabbedPane {
 
     private final JSplitPane calculationTab;
 
@@ -28,31 +24,5 @@ public class CoolingTab extends JTabbedPane implements ChangeListener {
 
         addTab("Расчёт", calculationTab);
         addTab("История", historyTab);
-
-        addChangeListener(this);
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        onTabChanged();
-    }
-
-    private void onTabChanged() {
-        int selectedIndex = getSelectedIndex();
-
-        if (selectedIndex == 1) {
-            if (UserDb.INSTANCE == null) {
-                SwingUtilities.invokeLater(() -> {
-                    LoginDialog loginDialog = new LoginDialog(null);
-                    loginDialog.setVisible(true);
-
-                    if (UserDb.INSTANCE == null) {
-                        setSelectedIndex(0);
-                    } else {
-                        historyTab.refresh();
-                    }
-                });
-            }
-        }
     }
 }

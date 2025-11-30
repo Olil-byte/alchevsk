@@ -3,15 +3,13 @@ package lpr.olil.view;
 import lpr.olil.calculator.DuctCalculator;
 import lpr.olil.model.*;
 
-import lpr.olil.user.UserDb;
+import lpr.olil.user.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.*;
 import java.util.Objects;
-
-import java.sql.PreparedStatement;
 
 public class CoolingCalculationPanel extends JScrollPane {
 
@@ -111,8 +109,8 @@ public class CoolingCalculationPanel extends JScrollPane {
         WaterFlow waterFlow = createWaterFlow();
 
         // add to history
-        if (UserDb.INSTANCE != null) {
-            Connection dbConnection = UserDb.INSTANCE.getConnection();
+        if (User.isAuthorized()) {
+            Connection dbConnection = User.getDbConnection();
             try {
                 String sql =
                         """
