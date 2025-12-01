@@ -1,9 +1,9 @@
 package lpr.olil.view;
 
 import lpr.olil.calculator.DuctCalculator;
+import lpr.olil.calculator.WaterFlowCalculator;
 import lpr.olil.model.*;
 
-import lpr.olil.user.User;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -11,41 +11,44 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class CoolingCalculationPanel extends JScrollPane {
+import lpr.olil.util.HistoryService;
 
+public class CoolingCalculationPanel extends JScrollPane {
     private static final int MAX_COMPONENT_HEIGHT = 20;
     private static final String DUCT_COUNT_LABEL = "Количество каналов (шт.)";
+
+    private static final String FLOW_VELOCITY_LABEL = "Скорость потока, м/с";
+    private static final String CONSUMPTION_LABEL = "Расход воды, л/с";
+
     private static final String CALCULATE_BUTTON_TEXT = "Рассчитать";
 
     private final CoolingParametersForm coolingParametersForm;
     private final JPanel content;
     private final JTextField ductCountField;
-
+    private final JTextField flowVelocityField;
+    private final JTextField consuptionField;
     private final CoolingHistoryPanel historyPanel;
+    private final HistoryService historyService;
 
-    private JLabel distanceBetweenDuctsSymbolicFormulaLabel;
-    private JLabel distanceBetweenDuctsEvaluatedExpressionLabel;
-
-    private JLabel perimeterSymbolicFormulaLabel;
-    private JLabel perimeterEvaluatedExpressionLabel;
-
-    private JLabel ductCountSymbolicFormulaLabel;
-    private JLabel ductCountEvaluatedExpressionLabel;
+    private final List<FormulaPair> formulaPairs;
 
     public CoolingCalculationPanel(CoolingParametersForm coolingParametersForm, CoolingHistoryPanel historyPanel) {
         this.coolingParametersForm = Objects.requireNonNull(coolingParametersForm,
                 "CoolingParametersForm cannot be null");
-
         this.historyPanel = historyPanel;
+        this.historyService = new HistoryService();
+        this.formulaPairs = new ArrayList<>();
 
         this.content = createContentPanel();
         this.ductCountField = createDuctCountField();
+        this.flowVelocityField = createFlowVelocityField();
+        this.consuptionField = createConsumptionField();
 
         setupUI();
-
         prepareFormulas();
     }
 
@@ -63,85 +66,89 @@ public class CoolingCalculationPanel extends JScrollPane {
         return field;
     }
 
+    private JTextField createFlowVelocityField() {
+        JTextField field = new JTextField();
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        field.setEditable(false);
+        return field;
+    }
+
+    private JTextField createConsumptionField() {
+        JTextField field = new JTextField();
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, MAX_COMPONENT_HEIGHT));
+        field.setEditable(false);
+        return field;
+    }
+
     private void setupUI() {
         addDuctCountComponents();
+
+        addFlowVelocityComponents();
+        addConsumptionComponents();
+
         addCalculateButton();
         setViewportView(content);
     }
 
     private void prepareFormulas() {
-        prepareDistanceBetweenDuctsFormula();
-        preparePerimeterFormula();
-        prepareDuctCountFormula();
+        formulaPairs.add(createFormulaPair(
+                "Z = 2 \\cdot \\sqrt{\\left(2 \\cdot l_{ст.} + \\frac{d}{2}\\right)^2 - \\left(l_{ст.} + \\frac{d}{2}\\right)^2} \\text{-- расстояние между каналами, м}",
+                FormulaType.DISTANCE_BETWEEN_DUCTS
+        ));
+
+        formulaPairs.add(createFormulaPair(
+                "П = 2 \\cdot \\left( B + b \\right) \\text{-- периметр стенок кристаллизатора, м}",
+                FormulaType.PERIMETER
+        ));
+
+        formulaPairs.add(createFormulaPair(
+                "n = \\frac{П}{Z + d} \\text{-- количество каналов, шт.}",
+                FormulaType.DUCT_COUNT
+        ));
+
+        formulaPairs.add(createFormulaPair(
+                "W_{в} = \\frac{2 A \\nu m (B + b) \\cdot l_{а}}{n \\left(\\pi d^2/4\\right) \\cdot C \\cdot \\rho_{в} \\left(T_{вых} - Т_{вх}\\right)} \\text{-- скорость течения, м/c}",
+                FormulaType.FLOW_VELOCITY
+        ));
+
+        formulaPairs.add(createFormulaPair(
+                "G_{в} = \\left(\\pi d^2 / 4\\right) \\cdot n \\cdot W_{в} \\text{-- расход воды, л/с}",
+                FormulaType.CONSUMPTION
+        ));
     }
 
-    private void prepareDistanceBetweenDuctsFormula() {
-        final TeXFormula symbolicFormula =
-                new TeXFormula("Z = 2 \\cdot \\sqrt{\\left(2 \\cdot l_{ст.} + \\frac{d}{2}\\right)^2 - \\left(l_{ст.} + \\frac{d}{2}\\right)^2} \\quad \\text{-- расстояние между каналами, м}");
-
-        final TeXIcon symbolicIcon = symbolicFormula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-
-        distanceBetweenDuctsSymbolicFormulaLabel = new JLabel(symbolicIcon);
-        distanceBetweenDuctsSymbolicFormulaLabel.setVisible(false);
-        distanceBetweenDuctsSymbolicFormulaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(distanceBetweenDuctsSymbolicFormulaLabel);
+    private FormulaPair createFormulaPair(String symbolicFormula, FormulaType type) {
+        JLabel symbolicLabel = FormulaDisplayHelper.createFormulaLabel(symbolicFormula, false);
+        content.add(symbolicLabel);
         content.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        distanceBetweenDuctsEvaluatedExpressionLabel = new JLabel();
-        distanceBetweenDuctsEvaluatedExpressionLabel.setVisible(false);
-        distanceBetweenDuctsEvaluatedExpressionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(distanceBetweenDuctsEvaluatedExpressionLabel);
+        JLabel evaluatedLabel = new JLabel();
+        evaluatedLabel.setVisible(false);
+        evaluatedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        content.add(evaluatedLabel);
         content.add(Box.createRigidArea(new Dimension(0, 10)));
-    }
 
-    private void preparePerimeterFormula() {
-        final TeXFormula symbolicFormula =
-                new TeXFormula("П = 2 \\cdot \\left( B + b \\right) \\quad \\text{-- периметр стенок кристаллизатора, м}");
-
-        final TeXIcon symbolicIcon = symbolicFormula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-
-        perimeterSymbolicFormulaLabel = new JLabel(symbolicIcon);
-        perimeterSymbolicFormulaLabel.setVisible(false);
-        perimeterSymbolicFormulaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(perimeterSymbolicFormulaLabel);
-        content.add(Box.createRigidArea(new Dimension(0, 5)));
-
-        perimeterEvaluatedExpressionLabel = new JLabel();
-        perimeterEvaluatedExpressionLabel.setVisible(false);
-        perimeterEvaluatedExpressionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(perimeterEvaluatedExpressionLabel);
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
-    }
-
-    private void prepareDuctCountFormula() {
-        final TeXFormula symbolicFormula =
-                new TeXFormula("n = \\frac{П}{Z + d} \\quad \\text{-- количество каналов, шт.}");
-
-        final TeXIcon symbolicIcon = symbolicFormula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-
-        ductCountSymbolicFormulaLabel = new JLabel(symbolicIcon);
-        ductCountSymbolicFormulaLabel.setVisible(false);
-        ductCountSymbolicFormulaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(ductCountSymbolicFormulaLabel);
-        content.add(Box.createRigidArea(new Dimension(0, 5)));
-
-        ductCountEvaluatedExpressionLabel = new JLabel();
-        ductCountEvaluatedExpressionLabel.setVisible(false);
-        ductCountEvaluatedExpressionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(ductCountEvaluatedExpressionLabel);
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
+        return new FormulaPair(symbolicLabel, evaluatedLabel, type);
     }
 
     private void addDuctCountComponents() {
         JLabel label = new JLabel(DUCT_COUNT_LABEL);
         content.add(label);
         content.add(ductCountField);
+        content.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    private void addFlowVelocityComponents() {
+        JLabel label = new JLabel(FLOW_VELOCITY_LABEL);
+        content.add(label);
+        content.add(flowVelocityField);
+        content.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    private void addConsumptionComponents() {
+        JLabel label = new JLabel(CONSUMPTION_LABEL);
+        content.add(label);
+        content.add(consuptionField);
         content.add(Box.createRigidArea(new Dimension(0, 10)));
     }
 
@@ -153,18 +160,27 @@ public class CoolingCalculationPanel extends JScrollPane {
     }
 
     private void handleCalculation(ActionEvent event) {
-        coolingParametersForm.validateForm();
-
-        if (!coolingParametersForm.isValidForm()) {
-            showValidationError();
+        if (!validateForm()) {
             return;
         }
 
         try {
-            performCalculation();
+            CalculationResult result = performCalculation();
+            displayResults(result);
+            saveToHistory(result);
         } catch (Exception e) {
             handleCalculationError(e);
         }
+    }
+
+    private boolean validateForm() {
+        coolingParametersForm.validateForm();
+
+        if (!coolingParametersForm.isValidForm()) {
+            showValidationError();
+            return false;
+        }
+        return true;
     }
 
     private void showValidationError() {
@@ -181,145 +197,77 @@ public class CoolingCalculationPanel extends JScrollPane {
                 "Ошибка расчета",
                 JOptionPane.ERROR_MESSAGE);
         ductCountField.setText("");
+        flowVelocityField.setText("");
+        consuptionField.setText("");
         hideAllFormulas();
     }
 
-    private void performCalculation() {
+    private CalculationResult performCalculation() {
         Slab slab = createSlab();
         Wall wall = createWall();
         Crystallizer crystallizer = createCrystallizer(wall);
         Ccm ccm = createCcm(crystallizer);
-
-        DuctCalculator.Result result = DuctCalculator.calculateDuctCount(slab, ccm);
-        displayResult(result);
-
-        showSymbolicFormulas();
-
-        showEvaluatedExpressions(result, wall, crystallizer, slab);
-
         WaterFlow waterFlow = createWaterFlow();
 
-        saveToHistoryIfAuthorized(slab, wall, crystallizer, ccm, waterFlow);
+        DuctCalculator.Result ductResult = DuctCalculator.calculateDuctCount(slab, ccm);
+        WaterFlowCalculator.Result waterResult = WaterFlowCalculator.calculate(ductResult, ccm, waterFlow);
+
+        return new CalculationResult(slab, wall, crystallizer, ccm, waterFlow, ductResult, waterResult);
+    }
+
+    private void displayResults(CalculationResult result) {
+        ductCountField.setText(Integer.toString(result.ductResult.ductCount));
+
+        flowVelocityField.setText(Double.toString(result.waterResult.flowVelocity));
+        consuptionField.setText(Double.toString(result.waterResult.consumption));
+
+        showSymbolicFormulas();
+        updateEvaluatedFormulas(result);
     }
 
     private void showSymbolicFormulas() {
-        distanceBetweenDuctsSymbolicFormulaLabel.setVisible(true);
-        perimeterSymbolicFormulaLabel.setVisible(true);
-        ductCountSymbolicFormulaLabel.setVisible(true);
+        formulaPairs.forEach(pair -> pair.symbolicLabel.setVisible(true));
+    }
+
+    private void updateEvaluatedFormulas(CalculationResult result) {
+        for (FormulaPair pair : formulaPairs) {
+            String formula = buildEvaluatedFormula(pair.type, result);
+            FormulaDisplayHelper.updateFormulaLabel(pair.evaluatedLabel, formula);
+        }
+    }
+
+    private String buildEvaluatedFormula(FormulaType type, CalculationResult result) {
+        return switch (type) {
+            case DISTANCE_BETWEEN_DUCTS -> FormulaBuilder.buildDistanceFormula(
+                    result.wall, result.crystallizer, result.ductResult.distanceBetweenDucts);
+            case PERIMETER -> FormulaBuilder.buildPerimeterFormula(
+                    result.slab, result.ductResult.perimeter);
+            case DUCT_COUNT -> FormulaBuilder.buildDuctCountFormula(
+                    result.ductResult.perimeter, result.ductResult.distanceBetweenDucts,
+                    result.crystallizer.getDuctDiameter(), result.ductResult.ductCount);
+            case FLOW_VELOCITY -> FormulaBuilder.buildFlowVelocityFormula(
+                    result.ductResult, result.wall, result.crystallizer,
+                    result.slab, result.ccm, result.waterFlow, result.waterResult);
+            case CONSUMPTION -> FormulaBuilder.buildConsumptionFormula(
+                    result.crystallizer, result.ductResult, result.waterResult);
+        };
     }
 
     private void hideAllFormulas() {
-        distanceBetweenDuctsSymbolicFormulaLabel.setVisible(false);
-        distanceBetweenDuctsEvaluatedExpressionLabel.setVisible(false);
-        perimeterSymbolicFormulaLabel.setVisible(false);
-        perimeterEvaluatedExpressionLabel.setVisible(false);
-        ductCountSymbolicFormulaLabel.setVisible(false);
-        ductCountEvaluatedExpressionLabel.setVisible(false);
+        formulaPairs.forEach(pair -> {
+            pair.symbolicLabel.setVisible(false);
+            pair.evaluatedLabel.setVisible(false);
+        });
     }
 
-    private void showEvaluatedExpressions(DuctCalculator.Result result, Wall wall, Crystallizer crystallizer, Slab slab) {
-        String distanceFormula = String.format(
-                "Z = 2 \\cdot \\sqrt{\\left(2 \\cdot %s + \\frac{%s}{2}\\right)^2 - \\left(%s + \\frac{%s}{2}\\right)^2} = %s\\,м",
-                formatNumber(wall.getLength()),
-                formatNumber(crystallizer.getDuctDiameter()),
-                formatNumber(wall.getLength()),
-                formatNumber(crystallizer.getDuctDiameter()),
-                formatNumber(result.distanceBetweenDucts)
+    private void saveToHistory(CalculationResult result) {
+        historyService.saveToHistoryIfAuthorized(
+                result.slab, result.wall, result.crystallizer,
+                result.ccm, result.waterFlow, this, historyPanel::refresh
         );
-        displayFormula(distanceBetweenDuctsEvaluatedExpressionLabel, distanceFormula);
-
-        String perimeterFormula = String.format(
-                "П = 2 \\cdot (%s + %s) = %s\\,м",
-                formatNumber(slab.getWidth()),
-                formatNumber(slab.getLength()),
-                formatNumber(result.perimeter)
-        );
-        displayFormula(perimeterEvaluatedExpressionLabel, perimeterFormula);
-
-        String ductCountFormula = String.format(
-                "n = \\frac{%s}{%s + %s} = %d\\,шт",
-                formatNumber(result.perimeter),
-                formatNumber(result.distanceBetweenDucts),
-                formatNumber(crystallizer.getDuctDiameter()),
-                result.ductCount
-        );
-        displayFormula(ductCountEvaluatedExpressionLabel, ductCountFormula);
     }
 
-    private void displayFormula(JLabel label, String formula) {
-        try {
-            TeXFormula texFormula = new TeXFormula(formula);
-            TeXIcon icon = texFormula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-            label.setIcon(icon);
-            label.setVisible(true);
-        } catch (Exception e) {
-            label.setIcon(null);
-            label.setText(formula.replace("\\,", " ").replace("\\", ""));
-            label.setVisible(true);
-        }
-    }
-
-    private String formatNumber(double value) {
-        if (value == (long) value) {
-            return String.format("%d", (long) value);
-        } else {
-            String formatted = String.format("%.3f", value);
-            return formatted.replaceAll("0*$", "").replaceAll("\\.$", "");
-        }
-    }
-
-    private void saveToHistoryIfAuthorized(Slab slab, Wall wall, Crystallizer crystallizer, Ccm ccm, WaterFlow waterFlow) {
-        if (!User.isAuthorized()) {
-            return;
-        }
-
-        Connection dbConnection = User.getDbConnection();
-        String sql =
-                """
-                INSERT INTO alchevsk.cooling_history (
-                    ccm_geometry,
-                    slab_width,
-                    slab_height,
-                    wall_type,
-                    wall_length,
-                    wall_active_length,
-                    wall_thickness,
-                    duct_diameter,
-                    inlet_temperature,
-                    outlet_temperature,
-                    water_density,
-                    water_conductivity
-                ) VALUES (?::alchevsk.ccm_geometry, ?, ?, ?::alchevsk.wall_type, ?, ?, ?, ?, ?, ?, ?, ?);
-                """;
-
-        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
-            statement.setString(1, (ccm instanceof VerticalCcm ? "vertical" : "curved"));
-            statement.setDouble(2, slab.getWidth());
-            statement.setDouble(3, slab.getLength());
-            statement.setString(4, (wall instanceof SmoothedWall ? "smoothed" : "profiled"));
-            statement.setDouble(5, wall.getLength());
-            statement.setDouble(6, wall.getActiveLength());
-            statement.setDouble(7, wall.getThickness());
-            statement.setDouble(8, crystallizer.getDuctDiameter());
-            statement.setDouble(9, waterFlow.getInletTemperature());
-            statement.setDouble(10, waterFlow.getOutletTemperature());
-            statement.setDouble(11, waterFlow.getDensity());
-            statement.setDouble(12, waterFlow.getConductivity());
-            statement.executeUpdate();
-
-            historyPanel.refresh();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                    "Ошибка сохранения в историю: " + e.getMessage(),
-                    "Ошибка базы данных",
-                    JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void displayResult(DuctCalculator.Result result) {
-        ductCountField.setText(Integer.toString(result.ductCount));
-    }
-
+    // Методы создания моделей остаются без изменений
     private Slab createSlab() {
         SlabForm slabForm = coolingParametersForm.getSlabForm();
         return new Slab(slabForm.getWidthValue(), slabForm.getLengthValue());
@@ -327,7 +275,6 @@ public class CoolingCalculationPanel extends JScrollPane {
 
     private Wall createWall() {
         WallForm wallForm = coolingParametersForm.getWallForm();
-
         return new WallBuilder()
                 .ofType(wallForm.getSelectedType())
                 .withLength(wallForm.getLengthValue())
@@ -343,7 +290,6 @@ public class CoolingCalculationPanel extends JScrollPane {
 
     private Ccm createCcm(Crystallizer crystallizer) {
         CcmForm ccmForm = coolingParametersForm.getCcmForm();
-
         return new CcmBuilder()
                 .withGeometry(ccmForm.getSelectedGeometryType())
                 .withCastingSpeed(ccmForm.getCastingSpeedValue())
@@ -353,12 +299,54 @@ public class CoolingCalculationPanel extends JScrollPane {
 
     private WaterFlow createWaterFlow() {
         WaterFlowForm waterFlowForm = coolingParametersForm.getWaterFlowForm();
-
         return new WaterFlow(
                 waterFlowForm.getInletTemperatureValue(),
                 waterFlowForm.getOutletTemperatureValue(),
                 waterFlowForm.getDensityValue(),
                 waterFlowForm.getConductivityValue()
         );
+    }
+
+    // Вспомогательные классы
+    private static class FormulaPair {
+        final JLabel symbolicLabel;
+        final JLabel evaluatedLabel;
+        final FormulaType type;
+
+        FormulaPair(JLabel symbolicLabel, JLabel evaluatedLabel, FormulaType type) {
+            this.symbolicLabel = symbolicLabel;
+            this.evaluatedLabel = evaluatedLabel;
+            this.type = type;
+        }
+    }
+
+    private static class CalculationResult {
+        final Slab slab;
+        final Wall wall;
+        final Crystallizer crystallizer;
+        final Ccm ccm;
+        final WaterFlow waterFlow;
+        final DuctCalculator.Result ductResult;
+        final WaterFlowCalculator.Result waterResult;
+
+        CalculationResult(Slab slab, Wall wall, Crystallizer crystallizer, Ccm ccm,
+                          WaterFlow waterFlow, DuctCalculator.Result ductResult,
+                          WaterFlowCalculator.Result waterResult) {
+            this.slab = slab;
+            this.wall = wall;
+            this.crystallizer = crystallizer;
+            this.ccm = ccm;
+            this.waterFlow = waterFlow;
+            this.ductResult = ductResult;
+            this.waterResult = waterResult;
+        }
+    }
+
+    private enum FormulaType {
+        DISTANCE_BETWEEN_DUCTS,
+        PERIMETER,
+        DUCT_COUNT,
+        FLOW_VELOCITY,
+        CONSUMPTION
     }
 }

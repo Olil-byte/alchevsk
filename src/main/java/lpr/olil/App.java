@@ -47,11 +47,6 @@ public class App {
                 waterFlow
         );
 
-        System.out.println(waterFlowCalculationResult.flowVelocity);
-        System.out.println(waterFlowCalculationResult.consumption);
-
-        User.authorize("test", "1234");
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

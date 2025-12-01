@@ -113,7 +113,7 @@ public class CoolingHistoryPanel extends JPanel {
 
         Connection dbConnection = User.getDbConnection();
         try {
-            String sql = """
+            String sql = String.format("""
                 SELECT
                     date,
                     ccm_geometry,
@@ -128,9 +128,9 @@ public class CoolingHistoryPanel extends JPanel {
                     outlet_temperature,
                     water_density,
                     water_conductivity
-                FROM alchevsk.cooling_history
+                FROM alchevsk.%s_cooling_history
                 ORDER BY date DESC
-                """;
+                """, User.getName());
 
             java.sql.PreparedStatement statement = dbConnection.prepareStatement(sql);
             ResultSet results = statement.executeQuery();

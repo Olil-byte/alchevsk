@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 
 public class User {
     private static Connection dbConnection = null;
+    private static String name = null;
 
     public static Connection getDbConnection() {
         return dbConnection;
@@ -19,9 +20,15 @@ public class User {
             );
         } catch (Exception e) {
         }
+
+        name = login;
     }
 
     public static boolean isAuthorized() {
         return dbConnection != null;
+    }
+
+    public static String getName() {
+        return name;
     }
 }

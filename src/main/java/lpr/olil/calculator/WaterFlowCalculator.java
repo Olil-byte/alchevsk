@@ -3,7 +3,7 @@ package lpr.olil.calculator;
 import lpr.olil.model.*;
 
 public class WaterFlowCalculator {
-    private static double getScalarA(final Ccm ccm, final Wall wall) {
+    public static double getScalarA(final Ccm ccm, final Wall wall) {
         if (ccm instanceof CurvedCcm && wall instanceof SmoothedWall) {
             return 953.0;
         } else if (ccm instanceof VerticalCcm && wall instanceof SmoothedWall) {
@@ -13,7 +13,7 @@ public class WaterFlowCalculator {
         }
     }
 
-    private static double getScalarM(final Ccm ccm, final Wall wall) {
+    public static double getScalarM(final Ccm ccm, final Wall wall) {
         if (ccm instanceof CurvedCcm && wall instanceof SmoothedWall) {
             return 1.0 / 3.0;
         } else if (ccm instanceof VerticalCcm && wall instanceof SmoothedWall) {
